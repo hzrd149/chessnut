@@ -108,7 +108,7 @@ flowchart TD
     afindPlayer[Find player B]-->aCreateGame[Create game]
     aCreateGame-->aSendNuts[Send nuts]
     aCreateGame-.Start without nuts.->aWaitForTurn
-    aSendNuts--> aWaitForNuts([Wait for B nut reward])
+    aSendNuts--> aWaitForNuts([Wait for reward])
     aSendNuts-.Start without nuts.->aWaitForTurn
     aWaitForNuts-->aWaitForTurn([Wait for turn])
     aWaitForTurn-->aGameMove[Game Move]
@@ -120,8 +120,8 @@ flowchart TD
 
     subgraph Moderator Bot
     modFindGame([Find game])-->modWatchForNuts([Watch for nuts])
-    modWatchForNuts-->modConsumeNut[Melt nut]
-    modConsumeNut-->modPostNut[Post Nut Reward]
+    modWatchForNuts-->modConsumeNut[Melt nuts]
+    modConsumeNut-->modCreateReward[Create reward]
     modFindGame-->modWatchMove([Watch moves])
     modFindGame-->modWatchForfeit([Watch Forfeit])
     modFindGame-->modWatchForDraw([Watch for draws])
@@ -133,7 +133,7 @@ flowchart TD
     end
 
     subgraph Blayer B
-    bLookForGames([Find game])-->bWaitForNuts([Wait for nuts])
+    bLookForGames([Find game])-->bWaitForNuts([Wait reward])
     bWaitForNuts-.start without nuts.->bFirstMove
     bWaitForNuts-->bSendNuts[Send nuts]
     bSendNuts-->bFirstMove[First move]
@@ -148,8 +148,8 @@ flowchart TD
     aSendNuts-.->modWatchForNuts
     bSendNuts-.->modWatchForNuts
     bFirstMove-.->aWaitForTurn
-    modPostNut-.->bWaitForNuts
-    modPostNut-.->aWaitForNuts
+    modCreateReward-.->bWaitForNuts
+    modCreateReward-.->aWaitForNuts
     aCreateGame-.->bLookForGames
     aCreateGame-.->modFindGame
     aGameMove-.->bWaitForTurn
