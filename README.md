@@ -31,8 +31,8 @@ erDiagram
         string target "[p, target, r, 'target']"
         string moderator "[p, moderator, r, 'moderator']"
         string state "[state, fen] starting state"
-        int expire "[expire, unix date] the experation date (optional)"
-        int timeout "[timeout, seconds] how long to wait for next move (optional)"
+        int expire "[expire, unix date] the expiration date (optional)"
+        int timeout "[timeout, seconds] how long to wait for next state (optional)"
     }
     GAME ||--|| PLAYER : author
     GAME ||--|| PLAYER : target
@@ -51,7 +51,7 @@ erDiagram
     }
     STATE ||--|| PLAYER : author
     STATE ||--|| GAME : game
-    STATE ||--o| MOVE : previous
+    STATE ||--o| STATE : previous
     STATE ||--|| MODERATOR : moderator
 
     CREATE-REWARD {
@@ -73,7 +73,7 @@ erDiagram
         string player "[p, player] player who create the reward"
         int amount "[value, int] value in sats"
         string game "[e, game, r, 'game']"
-        string proofs "[cashuProofs, tokens] tokens with only proofs (NUT-07)"
+        string proofs "[proofs, JSON.stringify(proofs)] tokens with only proofs (NUT-07)"
     }
     REWARD ||--|| MODERATOR : author
     REWARD ||--|| PLAYER : player
@@ -84,13 +84,13 @@ erDiagram
         int kind "2505"
         string author "moderator"
         string content "human readable message"
-        string reason "[reason, enum reason] (checkmate, branching, draw, invalid move)"
+        string reason "[reason, enum reason] (checkmate, branching, draw, invalid state)"
         string game "[e, game, r, 'game']"
         string previous "[e, state id, r, 'previous'] (optional)"
         string state "[state, fen] ending state"
         string winner "[p, winner, r, 'winner']"
         string looser "[p, looser, r, 'looser']"
-        string winnings "[winnings, int] total amount of the loosers rewards"
+        string winnings "[winnings, int] total amount of the looser's rewards"
         string reward "[cashu, token] (encrypted for winner)"
     }
     FINISH ||--|| MODERATOR : author
