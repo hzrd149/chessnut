@@ -9,72 +9,100 @@ erDiagram
     METADATA {
         string name
         string picture
-        string lud16
     }
-    USER {
+    PLAYER {
         string pubkey
     }
-    USER ||--|| METADATA : "kind 0 event"
-
-    RELAY-LIST {
-        int kind "10002"
-        string[] relays
-    }
+    PLAYER ||--|| METADATA : pubkey
 
     MODERATOR {
         string pubkey
-        string[] activeGames
+        string[] relay-list "10002 relay list"
+        string[] games "keep track of active games"
     }
-    MODERATOR ||--|| RELAY-LIST : "mods post relay list"
-    MODERATOR ||--o{ GAME : "activeGames"
-    MODERATOR ||--|| METADATA : "bot account?"
+    MODERATOR ||--o{ GAME : games
+    MODERATOR ||--|| METADATA : pubkey
+
+    GAME {
+        string id "event id"
+        int kind "2500"
+        string content "public message?"
+        string author "player starting game"
+        string target "[p, target, r, 'target']"
+        string moderator "[p, moderator, r, 'moderator']"
+        string fen "[fen, state] starting state"
+    }
+    GAME ||--|| PLAYER : author
+    GAME ||--|| PLAYER : target
+    GAME ||--|| MODERATOR : moderator
 
     PLACE-BET {
-        string author
-        int kind "25003 Ephemeral Event"
-        int amount "redundant?"
-        string gameId
-        string modPubkey "p tag"
-        string cachuToken "minted tokens"
+        string id "event id"
+        string author "player placing the bet"
+        int kind "25003 (Ephemeral Event)"
+        string game "[e, game, r, 'game']"
+        string moderator "[p, moderator, r, 'moderator']"
+        string cashuToken "[cashu, tokens] encrypted for moderator"
     }
-    PLACE-BET ||--|| USER : "author"
-    PLACE-BET ||--|| GAME : "[e, gameId]"
-    PLACE-BET ||--|| MODERATOR : "[p, modPubkey]"
+    PLACE-BET ||--|| PLAYER : author
+    PLACE-BET ||--|| GAME : game
+    PLACE-BET ||--|| MODERATOR : moderator
 
     BET {
         string id "event id"
         int kind "2502"
         string author "moderator"
-        string player "the player placing the bet"
-        int amount "value in sats"
-        string gameId "ref to game start event"
-        string partialCachuToken "NUT-07"
+        string player "[p, player] player who placed the bet"
+        int amount "[value, int] value in sats"
+        string game "[e, game, r, 'game']"
+        string proofs "[cashuProofs, tokens] tokens with only proofs (NUT-07)"
     }
-    BET ||--|| MODERATOR : "author"
-    BET ||--|| USER : "[p, player]"
-    BET ||--|| GAME : "[e, gameId]"
+    BET ||--|| MODERATOR : author
+    BET ||--|| PLAYER : player
+    BET ||--|| GAME : game
 
-    GAME {
-        string id "event id"
-        int kind "2500"
-        string playerA "first p tag"
-        string playerB "second p tag"
-        string modPubkey "third p tag"
-        string fen "starting state"
-    }
-    GAME ||--|| USER : "[p, playerA]"
-    GAME ||--|| USER : "[p, playerB]"
-    GAME ||--|| MODERATOR : "[p, modPubkey]"
-
-    STATE {
+    MOVE {
         string id "event id"
         int kind "2501"
-        string fen "chess state"
-        string previusState
-        string gameId "ref to game start event"
+        string author "player making the move"
+        string move "[move, move] chess move"
+        string fen "[fen, state] new state"
+        string game "[e, game, r, 'game']"
+        string previous "[e, previous, r, 'previous'] (optional)"
     }
-    STATE ||--|| GAME : "[e, gameId]"
-    STATE ||--o| STATE : "[e, previusState]"
+    MOVE ||--|| PLAYER : author
+    MOVE ||--|| GAME : game
+    MOVE ||--o| MOVE : previous
+
+    FORFEIT {
+        string id "event id"
+        int kind "2504"
+        string author "player forfeiting"
+        string game "[e, game, r, 'game']"
+        string moderator "[p, moderator, r, 'moderator']"
+    }
+    FORFEIT ||--|| PLAYER : author
+    FORFEIT ||--|| GAME : game
+    FORFEIT ||--|| MODERATOR : moderator
+
+    FINISH {
+        string id "event id"
+        int kind "2505"
+        string author "moderator"
+        string content "human readable message"
+        string game "[e, game, r, 'game']"
+        string previous "[e, previous, r, 'move'] (optional)"
+        string fen "[fen, state] ending state"
+        string winner "[p, winner, r, 'winner']"
+        string looser "[p, looser, r, 'looser']"
+        string winnings "[winnings, int] amount awarded in sats"
+        string reward "[cashu, token] (encrypted for winner)"
+    }
+    FINISH ||--|| MODERATOR : author
+    FINISH ||--|| PLAYER : winner
+    FINISH ||--|| PLAYER : looser
+    FINISH ||--|| MOVE : previous
+    FINISH ||--|| GAME : game
 ```
 
 ## Game Flow
