@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext"
+  },
+  "include": ["./"],
+  "extends": "../tsconfig.node.json"
+}

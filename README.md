@@ -30,6 +30,7 @@ erDiagram
         string author "player starting game"
         string target "[p, target, r, 'target']"
         string moderator "[p, moderator, r, 'moderator']"
+        string relay "[r, relay] the relay that should be used"
         string state "[state, fen] starting state"
         int expire "[expire, unix date] the expiration date (optional)"
         int timeout "[timeout, seconds] how long to wait for next state (optional)"
@@ -54,7 +55,7 @@ erDiagram
     STATE ||--o| STATE : previous
     STATE ||--|| MODERATOR : moderator
 
-    CREATE-REWARD {
+    POST-REWARD {
         string id "event id"
         int kind "25002 (Ephemeral Event)"
         string author "player creating the reward"
@@ -62,9 +63,9 @@ erDiagram
         string moderator "[p, moderator, r, 'moderator']"
         string cashuToken "[cashu, tokens] encrypted for moderator"
     }
-    CREATE-REWARD ||--|| PLAYER : author
-    CREATE-REWARD ||--|| GAME : game
-    CREATE-REWARD ||--|| MODERATOR : moderator
+    POST-REWARD ||--|| PLAYER : author
+    POST-REWARD ||--|| GAME : game
+    POST-REWARD ||--|| MODERATOR : moderator
 
     REWARD {
         string id "event id"
