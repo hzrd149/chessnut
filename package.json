@@ -23,6 +23,8 @@
     "nostr-tools": "^1.10.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-error-boundary": "^4.0.4",
+    "react-use": "^17.4.0",
     "webln": "^0.3.2"
   },
   "devDependencies": {

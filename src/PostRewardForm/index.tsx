@@ -16,7 +16,7 @@ export default function PostRewardForm() {
   const toast = useToast();
 
   return (
-    <Tabs colorScheme="brand">
+    <Tabs colorScheme="purple">
       <TabList>
         <Tab>Pay with lightning</Tab>
         <Tab>Send Cashu token</Tab>
