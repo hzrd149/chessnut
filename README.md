@@ -29,7 +29,7 @@ erDiagram
         string content "public message"
         string author "player starting game"
         string playerA "[p, self, r, 'playerA']"
-        string playerB "[p, target, r, 'playerB']"
+        string playerB "[p, playerB, r, 'playerB']"
         string moderator "[p, moderator, r, 'moderator']"
         string relay "[r, relay] the relay that should be used"
         string state "[state, fen] starting state"
@@ -37,7 +37,8 @@ erDiagram
         int timeout "[timeout, seconds] how long to wait for next state (optional)"
     }
     GAME ||--|| PLAYER : author
-    GAME ||--|| PLAYER : playerA,playerB
+    GAME ||--|| PLAYER : playerA
+    GAME ||--|| PLAYER : playerB
     GAME ||--|| MODERATOR : moderator
 
     STATE {
