@@ -1,8 +1,7 @@
 import { Event, EventTemplate } from "nostr-tools";
 import { RELAY_URL } from "../const";
 import dayjs from "dayjs";
-
-const START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+import { Chess, DEFAULT_POSITION } from "chess.js";
 
 export type ParsedGame = {
   id: string;
@@ -51,11 +50,16 @@ export function buildDraftGameEvent(
       ["p", self, RELAY_URL, "playerA"],
       ["p", target, RELAY_URL, "playerB"],
       ["p", moderator, RELAY_URL, "moderator"],
-      ["state", START_FEN],
+      ["state", DEFAULT_POSITION],
       ["relay", RELAY_URL],
     ],
     created_at: dayjs().unix(),
   };
 
   return draft;
+}
+
+if (import.meta.env.DEV) {
+  //@ts-ignore
+  window.Chess = Chess;
 }

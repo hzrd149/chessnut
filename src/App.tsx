@@ -1,12 +1,12 @@
 import { Container } from "@chakra-ui/react";
 import Header from "./components/Header";
-import { useSearchParam } from "react-use";
-import HomeView from "./HomeView";
+import { useHash } from "react-use";
+import HomeView from "./views/HomeView";
 import { useAuth } from "./AuthProvider";
-import GameView from "./GameView";
+import GameView from "./views/GameView";
 
 export default function App() {
-  const gameId = useSearchParam("game");
+  const [gameId] = useHash();
   const auth = useAuth();
 
   return (

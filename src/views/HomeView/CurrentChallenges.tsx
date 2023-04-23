@@ -1,11 +1,11 @@
 import { Flex, Heading, Input, Text } from "@chakra-ui/react";
-import { useAuthPubkey } from "../AuthProvider";
+import { useAuthPubkey } from "../../AuthProvider";
 import { useState } from "react";
-import useGames from "../hooks/useGames";
-import { normalizeToHex } from "../helpers/nip19";
+import useGames from "../../hooks/useGames";
+import { normalizeToHex } from "../../helpers/nip19";
 import GameCard from "./GameCard";
 import { withErrorBoundary } from "react-error-boundary";
-import { ErrorFallback } from "../components/ErrorBoundary";
+import { ErrorFallback } from "../../components/ErrorBoundary";
 import InviteCard from "./InviteCard";
 
 function CurrentChallenges() {

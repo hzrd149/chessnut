@@ -84,7 +84,7 @@ erDiagram
 
     FINISH {
         string id "event id"
-        int kind "2505"
+        int kind "2503"
         string author "moderator"
         string content "human readable message"
         string reason "[reason, enum reason] (checkmate, branching, draw, invalid state)"

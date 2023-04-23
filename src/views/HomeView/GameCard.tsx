@@ -8,13 +8,16 @@ import {
   Flex,
   Text,
 } from "@chakra-ui/react";
-import { ParsedGame } from "../helpers/game-events";
-import UserAvatar from "../components/UserAvatar";
+import { ParsedGame } from "../../helpers/game-events";
+import UserAvatar from "../../components/UserAvatar";
+import { useHash } from "react-use";
 
 export default function GameCard({
   game,
   ...props
 }: { game: ParsedGame } & CardProps) {
+  const [hash, newHash] = useHash();
+
   return (
     <Card variant="outline" {...props}>
       <CardHeader>
@@ -32,7 +35,7 @@ export default function GameCard({
           color="purple"
           variant="outline"
           w="full"
-          onClick={() => (location.search = "?game=" + game.id)}
+          onClick={() => newHash(game.id)}
         >
           View
         </Button>

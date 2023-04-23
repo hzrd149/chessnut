@@ -12,14 +12,13 @@ import {
   Textarea,
   useToast,
 } from "@chakra-ui/react";
-import { RELAY_URL } from "../const";
-import { useAuthPubkey } from "../AuthProvider";
-import UserAvatar from "../components/UserAvatar";
-import useUserMetadata from "../hooks/useUserMetadata";
+import { RELAY_URL, MODERATOR_PUBKEY } from "../../const";
+import { useAuthPubkey } from "../../AuthProvider";
+import UserAvatar from "../../components/UserAvatar";
+import useUserMetadata from "../../hooks/useUserMetadata";
 import { useState } from "react";
-import { buildDraftGameEvent } from "../helpers/game-events";
-import { MODERATOR_PUBKEY } from "../const";
-import { ensureConnected, getRelay } from "../services/relays";
+import { buildDraftGameEvent } from "../../helpers/game-events";
+import { ensureConnected, getRelay } from "../../services/relays";
 
 export default function InviteCard({
   pubkey,
