@@ -1,16 +1,14 @@
 import { Flex, Heading, Input, Text } from "@chakra-ui/react";
-import { useAuth } from "../../AuthProvider";
 import { useState } from "react";
-import useGames from "../../hooks/useGames";
 import { normalizeToHex } from "../../helpers/nip19";
 import GameCard from "./GameCard";
 import { withErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "../../components/ErrorBoundary";
 import InviteCard from "./InviteCard";
+import useGames from "../../hooks/useGames";
 
 function CurrentChallenges() {
-  const { pubkey } = useAuth();
-  const games = useGames(pubkey);
+  const games = useGames();
 
   const [invite, setInvite] = useState("");
 

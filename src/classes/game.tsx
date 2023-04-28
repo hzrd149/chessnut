@@ -1,7 +1,8 @@
 import { Event, Sub } from "nostr-tools";
 import { ensureConnected, getRelay } from "../services/relays";
 import { Chess, Color } from "chess.js";
-import { ParsedState } from "../helpers/game-events";
+import { ParsedState, parseStateEvent } from "../helpers/game-events";
+import Signal from "./signal";
 
 export default class Game {
   id: string;
@@ -24,16 +25,7 @@ export default class Game {
   sub?: Sub;
   chess: Chess;
 
-  private listeners = new Set<Function>();
-  on(fn: Function) {
-    this.listeners.add(fn);
-  }
-  off(fn: Function) {
-    this.listeners.delete(fn);
-  }
-  notify() {
-    for (const fn of this.listeners) fn();
-  }
+  onChange = new Signal();
 
   constructor(event: Event) {
     if ((event.kind as number) !== 2500) throw new Error("event is not a game");
@@ -76,7 +68,7 @@ export default class Game {
 
   move(from: string, to: string) {
     this.chess.move({ from, to, promotion: "q" });
-    this.notify();
+    this.onChange.notify();
   }
 
   private handleStateEvent(state: Event) {
@@ -92,7 +84,7 @@ export default class Game {
     this.sub.on("event", (event) => {
       switch (event.kind as number) {
         case 2501:
-          this.states.set(event.id, event);
+          this.states.set(event.id, parseStateEvent(event));
           break;
         case 2502:
           this.rewards.push(event);
@@ -104,11 +96,11 @@ export default class Game {
     });
     this.sub.on("eose", () => {
       this.loaded = true;
-      this.notify();
+      this.onChange.notify();
     });
   }
 
-  get lastState() {}
+  // get lastState() {}
 
   unload() {
     if (this.sub) {

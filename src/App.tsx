@@ -7,7 +7,6 @@ import GameView from "./views/GameView";
 
 export default function App() {
   const [gameId] = useHash();
-  const auth = useAuth();
 
   return (
     <Container
@@ -20,7 +19,7 @@ export default function App() {
       padding="0"
     >
       <Header />
-      {auth.pubkey && (gameId ? <GameView /> : <HomeView />)}
+      {gameId ? <GameView /> : <HomeView />}
     </Container>
   );
 }

@@ -28,13 +28,10 @@ export default function Header() {
       </Heading>
 
       <Spacer />
-      {auth.pubkey ? (
-        <UserAvatar pubkey={auth.pubkey} />
-      ) : (
-        <Button colorScheme="purple" onClick={auth.loginWithNip07}>
-          Login
-        </Button>
-      )}
+      <Button colorScheme="purple" onClick={auth.loginWithNip07} mr="4">
+        Login
+      </Button>
+      <UserAvatar pubkey={auth.pubkey} />
     </Flex>
   );
 }

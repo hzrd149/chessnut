@@ -7,7 +7,7 @@ import {
   ChessgroundConfig,
   shortColorToLong,
 } from "../../helpers/chess";
-import useGameListener from "../../hooks/useGameListener";
+import useSignal from "../../hooks/useSignal";
 
 type onMove = NonNullable<NonNullable<ChessgroundConfig["events"]>["move"]>;
 
@@ -19,7 +19,8 @@ export type ChessboardProps = {
 export default function Chessboard({ game, onMove }: ChessboardProps) {
   const auth = useAuth();
 
-  useGameListener(game);
+  useSignal(game.onChange);
+
   const config = useMemo(() => {
     const isSpectator =
       auth.pubkey !== game.playerA && auth.pubkey !== game.playerB;

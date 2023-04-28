@@ -8,14 +8,14 @@ import {
   Flex,
   Text,
 } from "@chakra-ui/react";
-import { ParsedGame } from "../../helpers/game-events";
 import UserAvatar from "../../components/UserAvatar";
 import { useHash } from "react-use";
+import Game from "../../classes/game";
 
 export default function GameCard({
   game,
   ...props
-}: { game: ParsedGame } & CardProps) {
+}: { game: Game } & CardProps) {
   const [hash, newHash] = useHash();
 
   return (

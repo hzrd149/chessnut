@@ -8,7 +8,7 @@ import UserAvatar from "../../components/UserAvatar";
 import Chessboard, { ChessboardProps } from "./Chessboard";
 import Game from "../../classes/game";
 import { useCallback, useEffect, useMemo } from "react";
-import useGameListener from "../../hooks/useGameListener";
+import useSignal from "../../hooks/useSignal";
 import { buildDraftMoveEvent } from "../../helpers/game-events";
 
 function GameView() {
@@ -28,7 +28,7 @@ function GameView() {
     }
   }, [gameEvent]);
 
-  useGameListener(game);
+  useSignal(game?.onChange);
 
   useEffect(() => {
     if (game) {

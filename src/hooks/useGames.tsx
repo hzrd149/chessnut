@@ -1,14 +1,12 @@
-import { RELAY_URL } from "../const";
-import { arraySafeParse } from "../helpers/array";
-import { parseGameEvent } from "../helpers/game-events";
-import useRelaySub from "./useRelaySub";
-import useSubEvents from "./useSubEvents";
+import { useEffect } from "react";
+import { useAuth } from "../AuthProvider";
+import { listGames, loadGames, onGamesChange } from "../services/games";
+import useSignal from "./useSignal";
 
-export default function useGames(pubkey: string) {
-  const sub = useRelaySub(RELAY_URL, "games", [
-    { kinds: [2500], "#p": [pubkey] },
-  ]);
-  const events = useSubEvents(sub);
+export default function useGames() {
+  const { pubkey } = useAuth();
+  useSignal(onGamesChange);
+  useEffect(() => loadGames(pubkey), [pubkey]);
 
-  return arraySafeParse(events, parseGameEvent);
+  return listGames();
 }
