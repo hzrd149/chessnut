@@ -1,42 +1,8 @@
 import { Event, EventTemplate } from "nostr-tools";
-import { RELAY_URL } from "../const";
+import { GameTypes, RELAY_URL } from "../const";
 import dayjs from "dayjs";
 import { Chess, DEFAULT_POSITION } from "chess.js";
-import Game from "../classes/game";
-
-export type ParsedGame = {
-  id: string;
-  playerA: string;
-  playerB: string;
-  message: string;
-  state: string;
-  relay: string;
-  created: number;
-};
-export function parseGameEvent(game: Event): ParsedGame {
-  if ((game.kind as number) !== 2500) throw new Error("event is not a game");
-
-  const playerB = game.tags.find(
-    (t) => t[0] === "p" && t[3] === "playerB"
-  )?.[1];
-  if (!playerB) throw new Error("game missing playerB");
-
-  const state = game.tags.find((t) => t[0] === "state")?.[1];
-  if (!state) throw new Error("game missing state");
-
-  const relay = game.tags.find((t) => t[0] === "relay")?.[1];
-  if (!relay) throw new Error("game missing relay");
-
-  return {
-    id: game.id,
-    playerA: game.pubkey,
-    playerB,
-    message: game.content,
-    created: game.created_at,
-    state,
-    relay,
-  };
-}
+import ChessGame from "../classes/chess-game";
 
 export enum StateTypes {
   Move = "move",
@@ -77,6 +43,7 @@ export function parseStateEvent(state: Event): ParsedState {
 }
 
 export function buildDraftGameEvent(
+  type: GameTypes,
   self: string,
   target: string,
   message: string,
@@ -86,6 +53,7 @@ export function buildDraftGameEvent(
     kind: 2500 as number,
     content: message,
     tags: [
+      ["type", type],
       ["p", self, RELAY_URL, "playerA"],
       ["p", target, RELAY_URL, "playerB"],
       ["p", moderator, RELAY_URL, "moderator"],
@@ -99,7 +67,7 @@ export function buildDraftGameEvent(
 }
 
 export function buildDraftMoveEvent(
-  game: Game,
+  game: ChessGame,
   source: string,
   target: string
 ) {

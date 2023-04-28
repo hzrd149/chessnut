@@ -42,3 +42,11 @@ export function clearSubs() {
   }
   subs.clear();
 }
+
+if (import.meta.env.DEV) {
+  // @ts-ignore
+  window.gamesService = {
+    loadGames,
+    listGames,
+  };
+}

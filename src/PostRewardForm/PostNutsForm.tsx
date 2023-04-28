@@ -1,6 +1,6 @@
 import { Button, IconButton, Textarea, useToast } from "@chakra-ui/react";
 import { SyntheticEvent, useState } from "react";
-import { ChessNutKinds, MODERATOR_PUBKEY, RELAY_URL } from "../const";
+import { GameEventKinds, MODERATOR_PUBKEY, RELAY_URL } from "../const";
 import { EventTemplate } from "nostr-tools";
 import dayjs from "dayjs";
 import { ensureConnected, getRelay } from "../services/relays";
@@ -25,7 +25,7 @@ export default function PostNutsForm() {
       if (!encrypted) throw new Error("Failed to encrypt token");
 
       const event: EventTemplate = {
-        kind: ChessNutKinds.PostReward as number,
+        kind: GameEventKinds.PostReward as number,
         content: encrypted ?? "",
         created_at: dayjs().unix(),
         tags: [["p", MODERATOR_PUBKEY]],

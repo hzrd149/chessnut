@@ -1,11 +1,12 @@
 import { Event, Sub } from "nostr-tools";
 import { ensureConnected, getRelay } from "../services/relays";
-import { Chess, Color } from "chess.js";
 import { ParsedState, parseStateEvent } from "../helpers/game-events";
 import Signal from "./signal";
+import { GameEventKinds, GameTypes } from "../const";
 
 export default class Game {
   id: string;
+  type: GameTypes;
   relay: string;
   playerA: string;
   playerB: string;
@@ -23,12 +24,12 @@ export default class Game {
   loaded = false;
 
   sub?: Sub;
-  chess: Chess;
 
   onChange = new Signal();
 
   constructor(event: Event) {
-    if ((event.kind as number) !== 2500) throw new Error("event is not a game");
+    if ((event.kind as number) !== GameEventKinds.Game)
+      throw new Error("event is not a game");
 
     this.playerA = event.pubkey;
 
@@ -52,23 +53,14 @@ export default class Game {
     if (!relay) throw new Error("event missing relay");
     this.relay = relay;
 
+    const type = event.tags.find((t) => t[0] === "type")?.[1];
+    if (!type) throw new Error("event missing type");
+    this.type = type as GameTypes;
+
     this.id = event.id;
     this.message = event.content;
     this.created = event.created_at;
     this.rootEvent = event;
-
-    this.chess = new Chess(this.state);
-  }
-
-  getPlayerColor(pubkey: string): Color {
-    if (pubkey === this.playerA) return "b";
-    if (pubkey === this.playerB) return "w";
-    throw new Error("unrecognized pubkey");
-  }
-
-  move(from: string, to: string) {
-    this.chess.move({ from, to, promotion: "q" });
-    this.onChange.notify();
   }
 
   private handleStateEvent(state: Event) {

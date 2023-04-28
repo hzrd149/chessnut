@@ -6,10 +6,10 @@ import { withErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "../../components/ErrorBoundary";
 import UserAvatar from "../../components/UserAvatar";
 import Chessboard, { ChessboardProps } from "./Chessboard";
-import Game from "../../classes/game";
 import { useCallback, useEffect, useMemo } from "react";
 import useSignal from "../../hooks/useSignal";
 import { buildDraftMoveEvent } from "../../helpers/game-events";
+import ChessGame from "../../classes/chess-game";
 
 function GameView() {
   const [hash, newHash] = useHash();
@@ -21,7 +21,7 @@ function GameView() {
 
   const game = useMemo(() => {
     try {
-      return gameEvent && new Game(gameEvent);
+      return gameEvent && new ChessGame(gameEvent);
     } catch (e) {
       console.log("Failed to create game");
       console.log(e);

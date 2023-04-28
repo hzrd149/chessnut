@@ -1,18 +1,18 @@
 import { useMemo } from "react";
 import Chessground from "@react-chess/chessground";
 import { useAuth } from "../../AuthProvider";
-import Game from "../../classes/game";
 import {
   chessJsMovesToDests,
   ChessgroundConfig,
   shortColorToLong,
 } from "../../helpers/chess";
 import useSignal from "../../hooks/useSignal";
+import ChessGame from "../../classes/chess-game";
 
 type onMove = NonNullable<NonNullable<ChessgroundConfig["events"]>["move"]>;
 
 export type ChessboardProps = {
-  game: Game;
+  game: ChessGame;
   onMove?: onMove;
 };
 

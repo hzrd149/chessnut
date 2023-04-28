@@ -12,7 +12,7 @@ import {
   Textarea,
   useToast,
 } from "@chakra-ui/react";
-import { RELAY_URL, MODERATOR_PUBKEY } from "../../const";
+import { RELAY_URL, MODERATOR_PUBKEY, GameTypes } from "../../const";
 import { useAuth } from "../../AuthProvider";
 import UserAvatar from "../../components/UserAvatar";
 import useUserMetadata from "../../hooks/useUserMetadata";
@@ -34,6 +34,7 @@ export default function InviteCard({
     setLoading(true);
     try {
       const draft = buildDraftGameEvent(
+        GameTypes.Chess,
         self,
         pubkey,
         message,
