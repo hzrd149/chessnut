@@ -37,7 +37,7 @@ export default function Header() {
           </Badge>
         </Heading>
         <Spacer />
-        <UserAvatar pubkey={auth.pubkey} onClick={onOpen} />
+        <UserAvatar pubkey={auth.pubkey} onClick={onOpen} cursor="pointer" />
       </Flex>
       {isOpen && <ProfileModal isOpen={isOpen} onClose={onClose} />}
     </>

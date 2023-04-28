@@ -19,12 +19,14 @@ import useUserMetadata from "../../hooks/useUserMetadata";
 import { useState } from "react";
 import { buildDraftGameEvent } from "../../helpers/game-events";
 import { ensureConnected, getRelay } from "../../services/relays";
+import { useSigner } from "../../hooks/use-signer";
 
 export default function InviteCard({
   pubkey,
   ...props
 }: { pubkey: string } & CardProps) {
-  const { pubkey: self } = useAuth();
+  const auth = useAuth();
+  const signer = useSigner();
   const toast = useToast();
   const metadata = useUserMetadata(pubkey);
   const [message, setMessage] = useState("Play a chess game with me");
@@ -35,12 +37,12 @@ export default function InviteCard({
     try {
       const draft = buildDraftGameEvent(
         GameTypes.Chess,
-        self,
+        auth.pubkey,
         pubkey,
         message,
         MODERATOR_PUBKEY
       );
-      const signed = await window.nostr?.signEvent(draft);
+      const signed = await signer(draft);
       if (!signed) throw new Error("failed to sign");
       const relay = getRelay(RELAY_URL);
       await ensureConnected(relay);
