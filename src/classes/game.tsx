@@ -1,19 +1,22 @@
 import { Event, Sub } from "nostr-tools";
 import { ensureConnected, getRelay } from "../services/relays";
 import { Chess, Color } from "chess.js";
+import { ParsedState } from "../helpers/game-events";
 
 export default class Game {
   id: string;
   relay: string;
   playerA: string;
   playerB: string;
+  moderator: string;
   message: string;
   created: number;
   state: string;
 
   private rootEvent: Event;
   private finish?: Event;
-  private states: Event[] = [];
+  private states = new Map<string, ParsedState>();
+  private stateForwardRef = new Map<string, string[]>();
   private rewards: Event[] = [];
 
   loaded = false;
@@ -43,6 +46,12 @@ export default class Game {
     if (!playerB) throw new Error("game missing playerB");
     this.playerB = playerB;
 
+    const moderator = event.tags.find(
+      (t) => t[0] === "p" && t[3] === "moderator"
+    )?.[1];
+    if (!moderator) throw new Error("game missing moderator");
+    this.moderator = moderator;
+
     const state = event.tags.find((t) => t[0] === "state")?.[1];
     if (!state) throw new Error("event missing state");
     this.state = state;
@@ -65,11 +74,16 @@ export default class Game {
     throw new Error("unrecognized pubkey");
   }
 
-  async load() {
-    this.finish = undefined;
-    this.states = [];
-    this.rewards = [];
+  move(from: string, to: string) {
+    this.chess.move({ from, to, promotion: "q" });
+    this.notify();
+  }
 
+  private handleStateEvent(state: Event) {
+    // const prev;
+  }
+
+  async load() {
     const relay = getRelay(this.relay);
     await ensureConnected(relay);
 
@@ -78,7 +92,7 @@ export default class Game {
     this.sub.on("event", (event) => {
       switch (event.kind as number) {
         case 2501:
-          this.states.push(event);
+          this.states.set(event.id, event);
           break;
         case 2502:
           this.rewards.push(event);
@@ -93,6 +107,8 @@ export default class Game {
       this.notify();
     });
   }
+
+  get lastState() {}
 
   unload() {
     if (this.sub) {

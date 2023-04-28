@@ -5,10 +5,11 @@ import { Box, Button, Flex, Heading, Spinner, Text } from "@chakra-ui/react";
 import { withErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "../../components/ErrorBoundary";
 import UserAvatar from "../../components/UserAvatar";
-import Chessboard from "./Chessboard";
+import Chessboard, { ChessboardProps } from "./Chessboard";
 import Game from "../../classes/game";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import useGameListener from "../../hooks/useGameListener";
+import { buildDraftMoveEvent } from "../../helpers/game-events";
 
 function GameView() {
   const [hash, newHash] = useHash();
@@ -41,6 +42,17 @@ function GameView() {
     }
   }, [game]);
 
+  const handleMove = useCallback<NonNullable<ChessboardProps["onMove"]>>(
+    (from, to, capturedPiece) => {
+      if (!game) return;
+
+      game.move(from, to);
+      const draft = buildDraftMoveEvent(game, from, to);
+      console.log(draft);
+    },
+    [game]
+  );
+
   if (!gameEvent || !game?.loaded) return <Spinner />;
   if (!game) return <Heading>Failed to load game</Heading>;
 
@@ -53,7 +65,7 @@ function GameView() {
         <UserAvatar pubkey={game.playerB} size="md" />
       </Flex>
       <Box w="lg" h="lg">
-        <Chessboard game={game} />
+        <Chessboard game={game} onMove={handleMove} />
       </Box>
     </Flex>
   );

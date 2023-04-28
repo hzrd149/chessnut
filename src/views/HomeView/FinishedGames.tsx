@@ -1,9 +1,9 @@
 import { Flex } from "@chakra-ui/react";
 import useGames from "../../hooks/useGames";
-import { useAuthPubkey } from "../../AuthProvider";
+import { useAuth } from "../../AuthProvider";
 
 export default function FinishedGames() {
-  const pubkey = useAuthPubkey();
+  const { pubkey } = useAuth();
   // const games = useGames(pubkey);
 
   return <Flex></Flex>;

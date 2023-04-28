@@ -13,7 +13,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { RELAY_URL, MODERATOR_PUBKEY } from "../../const";
-import { useAuthPubkey } from "../../AuthProvider";
+import { useAuth } from "../../AuthProvider";
 import UserAvatar from "../../components/UserAvatar";
 import useUserMetadata from "../../hooks/useUserMetadata";
 import { useState } from "react";
@@ -24,7 +24,7 @@ export default function InviteCard({
   pubkey,
   ...props
 }: { pubkey: string } & CardProps) {
-  const self = useAuthPubkey();
+  const { pubkey: self } = useAuth();
   const toast = useToast();
   const metadata = useUserMetadata(pubkey);
   const [message, setMessage] = useState("Play a chess game with me");

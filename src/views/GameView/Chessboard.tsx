@@ -7,9 +7,19 @@ import {
   ChessgroundConfig,
   shortColorToLong,
 } from "../../helpers/chess";
+import useGameListener from "../../hooks/useGameListener";
 
-export default function Chessboard({ game }: { game: Game }) {
+type onMove = NonNullable<NonNullable<ChessgroundConfig["events"]>["move"]>;
+
+export type ChessboardProps = {
+  game: Game;
+  onMove?: onMove;
+};
+
+export default function Chessboard({ game, onMove }: ChessboardProps) {
   const auth = useAuth();
+
+  useGameListener(game);
   const config = useMemo(() => {
     const isSpectator =
       auth.pubkey !== game.playerA && auth.pubkey !== game.playerB;
@@ -33,6 +43,8 @@ export default function Chessboard({ game }: { game: Game }) {
         config.movable.color = shortColorToLong(myColor);
         config.movable.showDests = true;
         config.movable.dests = chessJsMovesToDests(game.chess);
+
+        config.events = { move: onMove };
       }
     }
 

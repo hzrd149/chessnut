@@ -2,6 +2,14 @@
 
 Chess over [nostr](https://github.com/nostr-protocol/nostr) where players can post rewards using [cachu](https://github.com/cashubtc) tokens (nuts)
 
+## TODO
+
+- User can create a temp profile
+- User can create a game with another user using QR codes
+- Support Tic Tack Toe and maybe checkers (or other simpler games)
+- Make it super easy to post rewards with lightning or nuts
+- Make it super easy to withdraw lightning to WOS
+
 ## Nostr Events
 
 ```mermaid
@@ -28,6 +36,7 @@ erDiagram
         int kind "2500"
         string content "public message"
         string author "player starting game"
+        string type "[type, enum] the type of game, chess/tictacktoe/checkers..."
         string playerA "[p, self, r, 'playerA']"
         string playerB "[p, playerB, r, 'playerB']"
         string moderator "[p, moderator, r, 'moderator']"

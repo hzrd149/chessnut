@@ -1,5 +1,5 @@
 import { Flex, Heading, Input, Text } from "@chakra-ui/react";
-import { useAuthPubkey } from "../../AuthProvider";
+import { useAuth } from "../../AuthProvider";
 import { useState } from "react";
 import useGames from "../../hooks/useGames";
 import { normalizeToHex } from "../../helpers/nip19";
@@ -9,7 +9,7 @@ import { ErrorFallback } from "../../components/ErrorBoundary";
 import InviteCard from "./InviteCard";
 
 function CurrentChallenges() {
-  const pubkey = useAuthPubkey();
+  const { pubkey } = useAuth();
   const games = useGames(pubkey);
 
   const [invite, setInvite] = useState("");
