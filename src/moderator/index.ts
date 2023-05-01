@@ -1,8 +1,13 @@
 import "dotenv/config.js";
 import { ensureConnected, getRelay } from "./relays.js";
 import { getPubkey } from "./keys.js";
-import { GameEventKinds } from "../common/const";
-import { getGameFromId, handleGameEvent, unloadAllGames } from "./games";
+import { GameEventKinds } from "../common/const.js";
+import { getGameFromId, handleGameEvent, unloadAllGames } from "./games.js";
+import { handlePlaceBetEvent } from "./bets.js";
+
+import crypto from "node:crypto";
+// @ts-ignore
+globalThis.crypto = crypto;
 
 const RELAY_URL = "wss://nostrue.com";
 
@@ -19,6 +24,12 @@ sub.on("event", async (event) => {
 
   switch (event.kind as number) {
     case GameEventKinds.PlaceBet:
+      try {
+        await handlePlaceBetEvent(event);
+      } catch (e) {
+        console.log(`Failed to handle place bet event ${event.id}`);
+        console.log(e);
+      }
       break;
     case GameEventKinds.Game:
       // start watching the game
@@ -36,6 +47,8 @@ sub.on("event", async (event) => {
 });
 
 function shutdown() {
+  console.log("\n");
+  console.log("Shutting down");
   unloadAllGames();
 }
 process.on("SIGTERM", shutdown);

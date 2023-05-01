@@ -1,5 +1,5 @@
 import { getPublicKey as nostrGetPubKey, nip19 } from "nostr-tools";
-import { NOSTR_NSEC } from "./const";
+import { NOSTR_NSEC } from "./const.js";
 
 export function getSecKey() {
   const nsec = NOSTR_NSEC;

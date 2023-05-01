@@ -5,7 +5,7 @@ export enum GameTypes {
 export enum GameEventKinds {
   Game = 2500,
   State = 2501,
-  PlaceBet = 2502,
-  PostBet = 25002,
+  PlaceBet = 25002,
+  PostBet = 2502,
   Finish = 2503,
 }

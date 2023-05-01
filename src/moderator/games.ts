@@ -1,7 +1,7 @@
 import { Event } from "nostr-tools";
-import Game from "../common/classes/game";
-import { RELAY_URL } from "./const";
-import { ensureConnected, getRelay } from "./relays";
+import Game from "../common/classes/game.js";
+import { RELAY_URL } from "./const.js";
+import { ensureConnected, getRelay } from "./relays.js";
 
 const games = new Map<string, Game>();
 

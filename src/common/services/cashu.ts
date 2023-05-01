@@ -21,11 +21,3 @@ export async function getWallet(mintUrl: string) {
   }
   return wallets.get(mintUrl) as CashuWallet;
 }
-
-if (import.meta.env.DEV) {
-  // @ts-ignore
-  window.cashuService = {
-    getMint,
-    getWallet,
-  };
-}

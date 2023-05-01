@@ -119,11 +119,13 @@ function GameView() {
         <Text>isCheckmate: {game.chess.isCheckmate() ? "true" : "false"}</Text>
         <Text>isDraw: {game.chess.isDraw() ? "true" : "false"}</Text>
       </Flex>
-      <PlaceBetModal
-        game={game}
-        isOpen={placeBetOpen}
-        onClose={closePlaceBet}
-      />
+      {placeBetOpen && (
+        <PlaceBetModal
+          game={game}
+          isOpen={placeBetOpen}
+          onClose={closePlaceBet}
+        />
+      )}
     </>
   );
 }

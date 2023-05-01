@@ -24,9 +24,14 @@ import { InvoiceCard } from "./InvoiceCard";
 import { Proof, getEncodedToken } from "@cashu/cashu-ts";
 import { useNip04Tools } from "../hooks/useNip04Tools";
 import { useSigner } from "../hooks/useSigner";
-import { ensureConnected, getRelay } from "../../common/services/relays";
+import {
+  ensureConnected,
+  getRelay,
+  waitForPub,
+} from "../../common/services/relays";
 import { DEFAULT_MINT } from "../const";
 import Game from "../../common/classes/game";
+import { buildPlaceBetEvent } from "../helpers/events";
 
 type MintRequest = {
   amount: number;
@@ -41,8 +46,7 @@ export default function PlaceBetModal({
 }: { game: Game } & Omit<ModalProps, "children">) {
   const [mintRequest, setMintRequest] = useState<MintRequest>();
   const [amount, setAmount] = useState("2");
-  const [checkingTokens, setCheckingTokens] = useState(false);
-  const [waitingFormMod, setWaitingForMod] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { encrypt } = useNip04Tools();
   const signer = useSigner();
   const toast = useToast();
@@ -50,6 +54,7 @@ export default function PlaceBetModal({
   const handleSubmit: React.FormEventHandler = async (e) => {
     e.preventDefault();
 
+    setLoading(true);
     const wallet = await getWallet(DEFAULT_MINT);
     const intAmount = parseInt(amount);
     if (!Number.isInteger(intAmount)) throw new Error("Failed to parse amount");
@@ -59,13 +64,14 @@ export default function PlaceBetModal({
       invoice: request.pr,
       hash: request.hash,
     });
+    setLoading(false);
   };
 
   const checkTokens = async () => {
     if (!mintRequest) return;
 
     try {
-      setCheckingTokens(true);
+      setLoading(true);
 
       const wallet = await getWallet(DEFAULT_MINT);
       const proofs = await wallet.requestTokens(
@@ -73,25 +79,17 @@ export default function PlaceBetModal({
         mintRequest.hash
       );
 
-      setCheckingTokens(false);
-      setWaitingForMod(true);
-
       const token = getEncodedToken({
         token: [{ mint: wallet.mint.mintUrl, proofs }],
       });
       const encryptedTokens = await encrypt(game.moderator, token);
-      const placeBetDraft = game.createPlaceBetEvent(encryptedTokens);
+      const placeBetDraft = buildPlaceBetEvent(game, encryptedTokens);
       const event = await signer(placeBetDraft);
       const relay = getRelay(game.relay);
       await ensureConnected(relay);
       const pub = relay.publish(event);
-
-      pub.on("ok", () => {
-        toast({ status: "success", description: "sent bet" });
-      });
-      pub.on("failed", () => {
-        toast({ status: "error", description: "failed to send bet" });
-      });
+      await waitForPub(pub);
+      toast({ status: "success", description: "sent bet" });
 
       setTimeout(() => {
         // timeout, reclaim tokens
@@ -102,8 +100,7 @@ export default function PlaceBetModal({
         console.log(e);
       }
     }
-    setCheckingTokens(false);
-    setWaitingForMod(false);
+    setLoading(false);
   };
 
   let content = <Spinner />;
@@ -118,7 +115,7 @@ export default function PlaceBetModal({
           w="full"
           mt="4"
           onClick={checkTokens}
-          isLoading={checkingTokens}
+          isLoading={loading}
         >
           Check Paid
         </Button>
@@ -143,7 +140,13 @@ export default function PlaceBetModal({
             <Button onClick={() => setAmount("21000")}>21K</Button>
           </ButtonGroup>
         </FormControl>
-        <Button type="submit" colorScheme="purple" w="full" mt="4">
+        <Button
+          type="submit"
+          colorScheme="purple"
+          w="full"
+          mt="4"
+          isLoading={loading}
+        >
           Create Invoice
         </Button>
       </form>

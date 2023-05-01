@@ -1,9 +1,8 @@
-import { Event, EventTemplate, Sub, nip04 } from "nostr-tools";
-import Signal from "./signal";
-import dayjs from "dayjs";
-import { GameEventKinds, GameTypes } from "../const";
-import { ParsedState, parseStateEvent } from "../event-helpers";
-import { ensureConnected, getRelay } from "../services/relays";
+import { Event, Sub } from "nostr-tools";
+import Signal from "./signal.js";
+import { GameEventKinds, GameTypes } from "../const.js";
+import { ParsedState, parseStateEvent } from "../event-helpers.js";
+import { ensureConnected, getRelay } from "../services/relays.js";
 
 export default class Game {
   id: string;
@@ -155,20 +154,5 @@ export default class Game {
       this.loaded = false;
       this.sub = undefined;
     }
-  }
-
-  createPlaceBetEvent(token: string) {
-    const draft: EventTemplate = {
-      kind: GameEventKinds.PlaceBet as number,
-      created_at: dayjs().unix(),
-      content: "",
-      tags: [
-        ["e", this.id, this.relay, "game"],
-        ["p", this.moderator, this.relay, "moderator"],
-        ["cashu", token],
-      ],
-    };
-
-    return draft;
   }
 }

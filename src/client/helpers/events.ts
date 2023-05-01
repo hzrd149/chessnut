@@ -1,8 +1,9 @@
 import { EventTemplate } from "nostr-tools";
-import { GameTypes } from "../../common/const";
+import { GameEventKinds, GameTypes } from "../../common/const";
 import { RELAY_URL } from "../const";
 import { DEFAULT_POSITION } from "chess.js";
 import dayjs from "dayjs";
+import Game from "../../common/classes/game";
 
 export function buildDraftGameEvent(
   type: GameTypes,
@@ -23,6 +24,21 @@ export function buildDraftGameEvent(
       ["relay", RELAY_URL],
     ],
     created_at: dayjs().unix(),
+  };
+
+  return draft;
+}
+
+export function buildPlaceBetEvent(game: Game, token: string) {
+  const draft: EventTemplate = {
+    kind: GameEventKinds.PlaceBet as number,
+    created_at: dayjs().unix(),
+    content: "",
+    tags: [
+      ["e", game.id, game.relay, "game"],
+      ["p", game.moderator, game.relay, "moderator"],
+      ["cashu", token],
+    ],
   };
 
   return draft;

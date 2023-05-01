@@ -1,9 +1,9 @@
 import { Event, EventTemplate } from "nostr-tools";
-import Game from "./game";
+import Game from "./game.js";
 import { Chess, Color } from "chess.js";
-import { GameEventKinds, GameTypes } from "../const";
+import { GameEventKinds, GameTypes } from "../const.js";
 import dayjs from "dayjs";
-import { StateTypes } from "../event-helpers";
+import { StateTypes } from "../event-helpers.js";
 
 export default class ChessGame extends Game {
   chess: Chess;
