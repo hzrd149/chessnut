@@ -1,6 +1,6 @@
 # ChessNut
 
-Chess over [nostr](https://github.com/nostr-protocol/nostr) where players can post rewards using [cachu](https://github.com/cashubtc) tokens (nuts)
+Chess over [nostr](https://github.com/nostr-protocol/nostr) where players can post rewards using [cashu](https://github.com/cashubtc) tokens (nuts)
 
 ## Nostr Events
 
