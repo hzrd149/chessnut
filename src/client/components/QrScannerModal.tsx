@@ -4,6 +4,7 @@ import {
   ModalBody,
   ModalContent,
   ModalFooter,
+  ModalHeader,
   ModalOverlay,
   ModalProps,
 } from "@chakra-ui/react";
@@ -14,7 +15,8 @@ export default function QrScannerModal({
   isOpen,
   onClose,
   onData,
-}: { onData: (text: string) => void } & Pick<
+  header,
+}: { onData: (text: string) => void; header?: string } & Pick<
   ModalProps,
   "isOpen" | "onClose"
 >) {
@@ -29,7 +31,8 @@ export default function QrScannerModal({
     <Modal isOpen={isOpen} onClose={handleClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalBody>
+        <ModalHeader>{header ?? "Scan QR code"}</ModalHeader>
+        <ModalBody py="0">
           <BarcodeScannerComponent
             stopStream={stopStream}
             onUpdate={(err, result) => {

@@ -2,6 +2,8 @@ import {
   Alert,
   AlertIcon,
   Button,
+  ButtonGroup,
+  Flex,
   FormControl,
   FormLabel,
   Heading,
@@ -19,6 +21,7 @@ import { useAuth } from "../AuthProvider";
 import QrCodeSvg from "./QrCodeSvg";
 import useUserMetadata from "../hooks/useUserMetadata";
 import { useEffect, useState } from "react";
+import { CopyIconButton } from "./CopyIconButton";
 
 export default function ProfileModal({
   isOpen,
@@ -46,7 +49,7 @@ export default function ProfileModal({
       <ModalContent>
         <ModalHeader p="4">Profile</ModalHeader>
         <ModalCloseButton />
-        <ModalBody px="4" py="0">
+        <ModalBody px="4" pt="0" pb="4">
           {window.nostr && !auth.nip07 && (
             <Button
               colorScheme="purple"
@@ -64,31 +67,25 @@ export default function ProfileModal({
               extension
             </Alert>
           )}
-          <FormControl>
-            <FormLabel>Email address</FormLabel>
+          <FormControl my="2">
+            <FormLabel>Username</FormLabel>
             <Input
               placeholder="Name"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
+              readOnly
             />
           </FormControl>
 
-          <Heading>Pubkey</Heading>
+          <Heading mt="2" size="lg">
+            Pubkey
+          </Heading>
           <QrCodeSvg content={auth.pubkey} border={1} />
+          <Flex>
+            <Input value={auth.pubkey} readOnly />
+            <CopyIconButton text={auth.pubkey} aria-label="Copy pubkey" />
+          </Flex>
         </ModalBody>
-
-        <ModalFooter>
-          <Button variant="ghost" mr="4" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            colorScheme="purple"
-            onClick={onClose}
-            isDisabled={auth.nip07}
-          >
-            Update
-          </Button>
-        </ModalFooter>
       </ModalContent>
     </Modal>
   );

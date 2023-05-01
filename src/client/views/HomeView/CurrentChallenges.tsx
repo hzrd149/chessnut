@@ -1,7 +1,7 @@
 import {
+  Button,
   Flex,
   Heading,
-  IconButton,
   Input,
   Text,
   useDisclosure,
@@ -16,11 +16,12 @@ import InviteCard from "./InviteCard";
 import useGames from "../../hooks/useGames";
 import { QrCodeIcon } from "../../components/Icons";
 import QrScannerModal from "../../components/QrScannerModal";
-import { nip19 } from "nostr-tools";
 
 function CurrentChallenges() {
   const toast = useToast();
   const games = useGames();
+
+  const sortedGames = Array.from(games).sort((a, b) => b.created - a.created);
 
   const {
     isOpen: qrScannerOpen,
@@ -31,16 +32,16 @@ function CurrentChallenges() {
 
   return (
     <Flex direction="column">
-      <Heading>Challenges</Heading>
-      {games.length > 0 ? (
+      <Heading>Games</Heading>
+      {sortedGames.length > 0 ? (
         <Flex direction="row" py="5" wrap="wrap" gap="4">
-          {games.map((game) => (
+          {sortedGames.map((game) => (
             <GameCard key={game.id} game={game} w="sm" maxW="full" />
           ))}
         </Flex>
       ) : (
         <Flex direction="column" alignItems="center" py="10">
-          <Heading size="md">No challenges.</Heading>
+          <Heading size="md">No games</Heading>
           <Text>Maybe tell your friends about ChessNut?</Text>
         </Flex>
       )}
@@ -49,28 +50,30 @@ function CurrentChallenges() {
         Create a new game
       </Heading>
       <Flex gap="2">
-        <IconButton
+        <Button
+          w="full"
           onClick={openScanner}
-          icon={<QrCodeIcon />}
+          leftIcon={<QrCodeIcon />}
           aria-label="Qr Scanner"
-        />
+        >
+          Scan Npub
+        </Button>
         <Input
           value={invite}
           onChange={(e) => setInvite(e.target.value)}
-          placeholder="npub1..."
+          placeholder="paste npub"
         />
       </Flex>
 
       {invite && (
-        <Flex direction="column" alignItems="center" py="10">
-          <InviteCard minW="sm" pubkey={normalizeToHex(invite)} />
-        </Flex>
+        <InviteCard w="full" maxW="sm" mt="4" pubkey={normalizeToHex(invite)} />
       )}
 
       {qrScannerOpen && (
         <QrScannerModal
           isOpen={qrScannerOpen}
           onClose={closeScanner}
+          header="Scan QR npub"
           onData={(data) => {
             setInvite(normalizeToHex(data));
           }}
