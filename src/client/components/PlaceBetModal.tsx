@@ -17,11 +17,13 @@ import {
   ButtonGroup,
   Spinner,
   useToast,
+  Heading,
+  Flex,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { getWallet } from "../../common/services/cashu";
 import { InvoiceCard } from "./InvoiceCard";
-import { Proof, getEncodedToken } from "@cashu/cashu-ts";
+import { getEncodedToken } from "@cashu/cashu-ts";
 import { useNip04Tools } from "../hooks/useNip04Tools";
 import { useSigner } from "../hooks/useSigner";
 import {
@@ -32,6 +34,7 @@ import {
 import { DEFAULT_MINT } from "../const";
 import Game from "../../common/classes/game";
 import { buildPlaceBetEvent } from "../helpers/events";
+import { CheckInCircle } from "./Icons";
 
 type MintRequest = {
   amount: number;
@@ -47,6 +50,7 @@ export default function PlaceBetModal({
   const [mintRequest, setMintRequest] = useState<MintRequest>();
   const [amount, setAmount] = useState("2");
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const { encrypt } = useNip04Tools();
   const signer = useSigner();
   const toast = useToast();
@@ -89,11 +93,21 @@ export default function PlaceBetModal({
       await ensureConnected(relay);
       const pub = relay.publish(event);
       await waitForPub(pub);
-      toast({ status: "success", description: "sent bet" });
 
-      setTimeout(() => {
+      const timeout = window.setTimeout(() => {
+        game.onBet.off(listener);
         // timeout, reclaim tokens
+        toast({ status: "error", description: "Failed to post bet" });
       }, 1000 * 30);
+
+      let listener = () => {
+        toast({ status: "success", description: "sent bet" });
+        setSuccess(true);
+        game.onBet.off(listener);
+        window.clearTimeout(timeout);
+      };
+
+      game.onBet.on(listener);
     } catch (e) {
       if (e instanceof Error) {
         toast({ status: "error", description: e.message });
@@ -105,7 +119,21 @@ export default function PlaceBetModal({
 
   let content = <Spinner />;
 
-  if (mintRequest) {
+  if (success) {
+    content = (
+      <Flex
+        alignItems="center"
+        justifyContent="center"
+        direction="column"
+        minH="sm"
+        gap="4"
+      >
+        <CheckInCircle fontSize="64" color="green" />
+        <Heading size="md">Placed bet</Heading>
+        <Button onClick={onClose}>Close</Button>
+      </Flex>
+    );
+  } else if (mintRequest) {
     content = (
       <>
         <InvoiceCard invoice={mintRequest.invoice} />

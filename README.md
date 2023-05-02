@@ -2,6 +2,8 @@
 
 Chess over [nostr](https://github.com/nostr-protocol/nostr) where players can post rewards using [cashu](https://github.com/cashubtc) tokens (nuts)
 
+# This is project isn't working yet, don't pay any lightning invoices (you will loose your hard earned sats)
+
 ## Nostr Events
 
 ```mermaid
@@ -58,30 +60,30 @@ erDiagram
     STATE ||--o| STATE : previous
     STATE ||--|| MODERATOR : moderator
 
-    POST-REWARD {
+    PLACE-BET {
         string id "event id"
         int kind "25002 (Ephemeral Event)"
-        string author "player creating the reward"
+        string author "player creating the bet"
         string game "[e, game, r, 'game']"
         string moderator "[p, moderator, r, 'moderator']"
         string cashuToken "[cashu, tokens] encrypted for moderator"
     }
-    POST-REWARD ||--|| PLAYER : author
-    POST-REWARD ||--|| GAME : game
-    POST-REWARD ||--|| MODERATOR : moderator
+    PLACE-BET ||--|| PLAYER : author
+    PLACE-BET ||--|| GAME : game
+    PLACE-BET ||--|| MODERATOR : moderator
 
-    REWARD {
+    BET {
         string id "event id"
         int kind "2502"
         string author "moderator"
-        string player "[p, player] player who create the reward"
+        string player "[p, player] player who create the bet"
         int amount "[value, int] value in sats"
         string game "[e, game, r, 'game']"
         string proofs "[proofs, JSON.stringify(proofs)] tokens with only proofs (NUT-07)"
     }
-    REWARD ||--|| MODERATOR : author
-    REWARD ||--|| PLAYER : player
-    REWARD ||--|| GAME : game
+    BET ||--|| MODERATOR : author
+    BET ||--|| PLAYER : player
+    BET ||--|| GAME : game
 
     FINISH {
         string id "event id"
@@ -94,8 +96,7 @@ erDiagram
         string state "[state, fen] ending state"
         string winner "[p, winner, r, 'winner']"
         string looser "[p, looser, r, 'looser']"
-        string winnings "[winnings, int] total amount of the looser's rewards"
-        string reward "[cashu, token] (encrypted for winner)"
+        string cashu "[cashu, token, player] (encrypted for player) (can have multiple)"
     }
     FINISH ||--|| MODERATOR : author
     FINISH ||--|| PLAYER : winner

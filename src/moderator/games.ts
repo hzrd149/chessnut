@@ -1,12 +1,13 @@
 import { Event } from "nostr-tools";
-import Game from "../common/classes/game.js";
+import ChessGame from "../common/classes/chess-game.js";
 import { RELAY_URL } from "./const.js";
 import { ensureConnected, getRelay } from "./relays.js";
+import createGameClass from "../common/helpers/create-game.js";
 
-const games = new Map<string, Game>();
+const games = new Map<string, ChessGame>();
 
 export function handleGameEvent(event: Event) {
-  const game = new Game(event);
+  const game = createGameClass(event);
   games.set(event.id, game);
   return game;
 }
@@ -17,7 +18,7 @@ export async function getGameFromId(gameId: string) {
   const event = await relay.get({ ids: [gameId] });
 
   if (!event) throw new Error(`Failed to find game ${gameId}`);
-  const game = new Game(event);
+  const game = createGameClass(event);
 
   games.set(gameId, game);
   return game;

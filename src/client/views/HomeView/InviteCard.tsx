@@ -24,8 +24,9 @@ import { buildDraftGameEvent } from "../../helpers/events";
 
 export default function InviteCard({
   pubkey,
+  onCreateGame,
   ...props
-}: { pubkey: string } & CardProps) {
+}: { pubkey: string; onCreateGame?: () => void } & CardProps) {
   const auth = useAuth();
   const signer = useSigner();
   const toast = useToast();
@@ -48,7 +49,10 @@ export default function InviteCard({
       const relay = getRelay(RELAY_URL);
       await ensureConnected(relay);
       const pub = relay.publish(signed);
-      pub.on("ok", () => toast({ status: "success", title: "Created game" }));
+      pub.on("ok", () => {
+        toast({ status: "success", title: "Created game" });
+        if (onCreateGame) onCreateGame();
+      });
       pub.on("failed", () =>
         toast({ status: "error", title: "Failed to create game" })
       );

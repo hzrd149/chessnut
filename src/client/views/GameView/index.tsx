@@ -1,4 +1,4 @@
-import { useHash, useSearchParam } from "react-use";
+import { useAsync, useHash, useSearchParam } from "react-use";
 import useSingleEvent from "../../hooks/useSingleEvent";
 import {
   AspectRatio,
@@ -10,6 +10,7 @@ import {
   useToast,
   ButtonGroup,
   useDisclosure,
+  Spacer,
 } from "@chakra-ui/react";
 import { withErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "../../components/ErrorBoundary";
@@ -22,8 +23,11 @@ import { useSigner } from "../../hooks/useSigner";
 import { ensureConnected, getRelay } from "../../../common/services/relays";
 import PlaceBetModal from "../../components/PlaceBetModal";
 import { RELAY_URL } from "../../const";
+import { useAuth } from "../../AuthProvider";
+import { loadGameById } from "../../services/games";
 
 function GameView() {
+  const auth = useAuth();
   const toast = useToast();
   const signer = useSigner();
   const [hash, newHash] = useHash();
@@ -37,20 +41,16 @@ function GameView() {
 
   if (!gameId) return <Heading>Missing game id</Heading>;
 
-  const gameEvent = useSingleEvent(relay ?? RELAY_URL, { ids: [gameId ?? ""] });
-
-  const game = useMemo(() => {
-    try {
-      return gameEvent && new ChessGame(gameEvent);
-    } catch (e) {
-      console.log("Failed to create game");
-      console.log(e);
-    }
-  }, [gameEvent]);
+  const { value: game, error } = useAsync(
+    () => loadGameById(gameId, relay ?? undefined),
+    [gameId]
+  );
+  if (error) return <Heading>Failed to load game {error.message}</Heading>;
 
   // update component when game changes
   useSignal(game?.onLoad);
   useSignal(game?.onState);
+  useSignal(game?.onBet);
 
   // load the game when the page mounts
   useEffect(() => {
@@ -88,19 +88,23 @@ function GameView() {
     [game]
   );
 
-  if (!gameEvent || !game?.loaded) return <Spinner />;
+  if (!game?.loaded) return <Spinner />;
   if (!game) return <Heading>Failed to load game</Heading>;
+
+  const isSpectator =
+    auth.pubkey !== game.playerA && auth.pubkey !== game.playerB;
+  const bets = game.getTotalBets();
 
   return (
     <>
-      <Flex direction="column" gap="4" px="4">
+      <Flex direction="column" gap="4" px="4" w="full" maxW="lg">
         <Flex flex="1" gap="4" alignItems="center">
           <Button onClick={() => newHash("")}>Back</Button>
           <UserAvatar pubkey={game.playerA} size="md" />
           <Text>VS</Text>
           <UserAvatar pubkey={game.playerB} size="md" />
         </Flex>
-        <AspectRatio w="full" ratio={1} maxW="lg">
+        <AspectRatio w="full" ratio={1}>
           <Chessboard game={game} onMove={handleMove} />
         </AspectRatio>
         <ButtonGroup w="full">
@@ -114,10 +118,13 @@ function GameView() {
             Forfeit
           </Button>
         </ButtonGroup>
-        <Text>turn: {game.chess.turn()}</Text>
-        <Text>isCheck: {game.chess.isCheck() ? "true" : "false"}</Text>
-        <Text>isCheckmate: {game.chess.isCheckmate() ? "true" : "false"}</Text>
-        <Text>isDraw: {game.chess.isDraw() ? "true" : "false"}</Text>
+        <Flex gap="2" alignItems="center">
+          <UserAvatar pubkey={game.playerA} size="md" />
+          <Text>{bets[game.playerA]} sats</Text>
+          <Spacer />
+          <Text>{bets[game.playerB]} sats</Text>
+          <UserAvatar pubkey={game.playerB} size="md" />
+        </Flex>
       </Flex>
       {placeBetOpen && (
         <PlaceBetModal

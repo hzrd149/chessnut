@@ -1,7 +1,12 @@
 import { Event, Sub } from "nostr-tools";
 import Signal from "./signal.js";
 import { GameEventKinds, GameTypes } from "../const.js";
-import { ParsedState, parseStateEvent } from "../event-helpers.js";
+import {
+  ParsedBet,
+  ParsedState,
+  parseBetEvent,
+  parseStateEvent,
+} from "../event-helpers.js";
 import { ensureConnected, getRelay } from "../services/relays.js";
 
 export default class Game {
@@ -19,7 +24,7 @@ export default class Game {
   finish?: Event;
   states = new Map<string, ParsedState>();
   stateForwardRef = new Map<string, string[]>();
-  rewards: Event[] = [];
+  bets = new Map<string, ParsedBet>();
   tail: string;
 
   loaded = false;
@@ -28,6 +33,7 @@ export default class Game {
 
   onLoad = new Signal();
   onState = new Signal();
+  onBet = new Signal();
 
   constructor(event: Event) {
     if ((event.kind as number) !== GameEventKinds.Game)
@@ -81,6 +87,18 @@ export default class Game {
       console.log(e);
     }
   }
+  handleBetEvent(event: Event) {
+    if (this.bets.has(event.id)) return;
+
+    try {
+      const bet = parseBetEvent(event);
+      this.bets.set(bet.id, bet);
+      this.onBet.notify()
+    } catch (e) {
+      console.log("Failed to handle bet event", event);
+      console.log(e);
+    }
+  }
 
   walkState(fn: (state: ParsedState) => void) {
     let i = this.id;
@@ -111,6 +129,17 @@ export default class Game {
     }
   }
 
+  getTotalBets() {
+    const betsByPlayer: Record<string, number> = {};
+
+    for (const [id, bet] of this.bets) {
+      if (!bet.amount) continue;
+      betsByPlayer[bet.player] = (betsByPlayer[bet.player] ?? 0) + bet.amount;
+    }
+
+    return betsByPlayer;
+  }
+
   async load() {
     const relay = getRelay(this.relay);
     await ensureConnected(relay);
@@ -120,7 +149,7 @@ export default class Game {
         {
           kinds: [
             GameEventKinds.State,
-            GameEventKinds.PostBet,
+            GameEventKinds.Bet,
             GameEventKinds.Finish,
           ],
           "#e": [this.id],
@@ -133,7 +162,7 @@ export default class Game {
             this.handleStateEvent(event);
             break;
           case 2502:
-            this.rewards.push(event);
+            this.handleBetEvent(event);
             break;
           case 2503:
             this.finish = event;

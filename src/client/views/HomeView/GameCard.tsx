@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Card,
   CardBody,
@@ -11,6 +12,7 @@ import {
 import UserAvatar from "../../components/UserAvatar";
 import { useHash } from "react-use";
 import Game from "../../../common/classes/game";
+import useSignal from "../../hooks/useSignal";
 
 export default function GameCard({
   game,
@@ -18,13 +20,27 @@ export default function GameCard({
 }: { game: Game } & CardProps) {
   const [hash, newHash] = useHash();
 
+  useSignal(game.onLoad);
+  const bets = game.getTotalBets();
+
   return (
     <Card variant="outline" {...props}>
       <CardHeader>
-        <Flex flex="1" gap="4" alignItems="center">
-          <UserAvatar pubkey={game.playerA} />
+        <Flex
+          flex="1"
+          gap="4"
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <Box>
+            <UserAvatar pubkey={game.playerA} />
+            <Text>{bets[game.playerA]} sats</Text>
+          </Box>
           <Text>VS</Text>
-          <UserAvatar pubkey={game.playerB} />
+          <Box>
+            <UserAvatar pubkey={game.playerB} />
+            <Text>{bets[game.playerB]} sats</Text>
+          </Box>
         </Flex>
       </CardHeader>
       <CardBody py="0">

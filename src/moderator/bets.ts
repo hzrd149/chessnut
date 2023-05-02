@@ -49,7 +49,7 @@ export async function handlePlaceBetEvent(event: Event) {
 
   const postBetDraft: EventTemplate = {
     created_at: dayjs().unix(),
-    kind: GameEventKinds.PostBet as number,
+    kind: GameEventKinds.Bet as number,
     content: "",
     tags: [
       ["e", game.id, game.relay, "game"],

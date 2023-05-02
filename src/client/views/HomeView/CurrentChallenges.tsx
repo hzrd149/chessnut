@@ -1,13 +1,17 @@
 import {
   Button,
   Flex,
+  FormControl,
+  FormLabel,
   Heading,
   Input,
+  Select,
+  Switch,
   Text,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { normalizeToHex } from "../../helpers/nip19";
 import GameCard from "./GameCard";
 import { withErrorBoundary } from "react-error-boundary";
@@ -16,12 +20,34 @@ import InviteCard from "./InviteCard";
 import useGames from "../../hooks/useGames";
 import { QrCodeIcon } from "../../components/Icons";
 import QrScannerModal from "../../components/QrScannerModal";
+import { useMeasure } from "react-use";
 
 function CurrentChallenges() {
   const toast = useToast();
   const games = useGames();
+  const [filter, setFilter] = useState("ongoing");
+  const [showNoBets, setShowNoBets] = useState(false);
 
-  const sortedGames = Array.from(games).sort((a, b) => b.created - a.created);
+  const filteredGames = useMemo(() => {
+    switch (filter) {
+      case "ongoing":
+        return games.filter((game) => !game.finish && game.states.size > 0);
+      case "challenges":
+        return games.filter((game) => !game.finish && game.states.size === 0);
+      case "finished":
+        return games.filter((game) => !!game.finish);
+      default:
+        return Array.from(games);
+    }
+  }, [filter, games]);
+
+  const filteredGamesWithBets = showNoBets
+    ? filteredGames
+    : filteredGames.filter((game) => game.bets.size > 0);
+
+  const sortedGames = Array.from(filteredGamesWithBets).sort(
+    (a, b) => b.created - a.created
+  );
 
   const {
     isOpen: qrScannerOpen,
@@ -32,9 +58,25 @@ function CurrentChallenges() {
 
   return (
     <Flex direction="column">
-      <Heading>Games</Heading>
+      <Select value={filter} onChange={(e) => setFilter(e.target.value)}>
+        <option value="ongoing">On-going</option>
+        <option value="challenges">Challenges</option>
+        <option value="finished">Finished</option>
+      </Select>
+      <FormControl display="flex" alignItems="center" mt="2">
+        <Switch
+          id="show-no-bets"
+          checked={showNoBets}
+          onChange={(e) => setShowNoBets(e.target.checked)}
+          mr="2"
+        />
+        <FormLabel htmlFor="show-no-bets" mb="0">
+          Show games with no bets
+        </FormLabel>
+      </FormControl>
+
       {sortedGames.length > 0 ? (
-        <Flex direction="row" py="5" wrap="wrap" gap="4">
+        <Flex direction="row" py="4" wrap="wrap" gap="4">
           {sortedGames.map((game) => (
             <GameCard key={game.id} game={game} w="sm" maxW="full" />
           ))}
@@ -66,7 +108,13 @@ function CurrentChallenges() {
       </Flex>
 
       {invite && (
-        <InviteCard w="full" maxW="sm" mt="4" pubkey={normalizeToHex(invite)} />
+        <InviteCard
+          w="full"
+          maxW="sm"
+          mt="4"
+          pubkey={normalizeToHex(invite)}
+          onCreateGame={() => setInvite("")}
+        />
       )}
 
       {qrScannerOpen && (
