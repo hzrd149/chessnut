@@ -1,7 +1,7 @@
 import { Event, EventTemplate, finishEvent, nip04 } from "nostr-tools";
 import { getWallet } from "./cashu.js";
 import { getSecKey } from "./keys.js";
-import { Proof, getDecodedToken, getEncodedToken } from "@cashu/cashu-ts";
+import { getDecodedToken, getEncodedToken } from "@cashu/cashu-ts";
 import { getGameFromId } from "./games.js";
 import { saveFullTokenForBet } from "./db.js";
 import type { Token } from "@cashu/cashu-ts/dist/lib/es5/model/types";
@@ -29,23 +29,30 @@ export async function handlePlaceBetEvent(event: Event) {
   const game = await getGameFromId(gameId);
   if (game.finish) throw new Error("game finished");
 
-  const wallet = await getWallet(process.env.VITE_MINT_URL as string);
-
+  // decrypt the cashu tokens
   const decrypted = await nip04.decrypt(getSecKey(), player, cashuToken);
   const parsedToken = getDecodedToken(decrypted);
+
   if (parsedToken.token.length > 1)
     throw new Error("cant handle tokens with multiple mints yet");
-  const { proofs, tokensWithErrors } = await wallet.receive(decrypted);
 
+  const mintUrl = parsedToken.token[0].mint;
+
+  // get or create a wallet
+  const wallet = await getWallet(mintUrl);
+
+  // receive the token
+  const { proofs, tokensWithErrors } = await wallet.receive(decrypted);
+  // throw an error if no proofs where received
   if (proofs.length === 0) throw new Error("token empty");
 
+  // create the new token
   const token: Token = {
-    token: [{ mint: parsedToken.token[0].mint, proofs }],
+    token: [{ mint: mintUrl, proofs }],
     memo: `bet from ${player}`,
   };
-  const leanProofs = proofs.map(
-    (proof) => ({ secret: proof.secret, amount: proof.amount } as Proof)
-  );
+
+  const total = proofs.reduce((v, p) => v + p.amount, 0);
 
   const postBetDraft: EventTemplate = {
     created_at: dayjs().unix(),
@@ -54,7 +61,8 @@ export async function handlePlaceBetEvent(event: Event) {
     tags: [
       ["e", game.id, game.relay, "game"],
       ["p", player, game.relay, "player"],
-      ["proofs", JSON.stringify(leanProofs)],
+      ["amount", String(total)],
+      ["mint", mintUrl],
     ],
   };
   const postBetEvent = await finishEvent(postBetDraft, getSecKey());

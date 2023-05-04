@@ -19,6 +19,7 @@ import {
   useToast,
   Heading,
   Flex,
+  Select,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { getWallet } from "../../common/services/cashu";
@@ -31,10 +32,10 @@ import {
   getRelay,
   waitForPub,
 } from "../../common/services/relays";
-import { DEFAULT_MINT } from "../const";
 import Game from "../../common/classes/game";
 import { buildPlaceBetEvent } from "../helpers/events";
 import { CheckInCircle } from "./Icons";
+import { MINTS } from "../const";
 
 type MintRequest = {
   amount: number;
@@ -48,6 +49,7 @@ export default function PlaceBetModal({
   ...props
 }: { game: Game } & Omit<ModalProps, "children">) {
   const [mintRequest, setMintRequest] = useState<MintRequest>();
+  const [mintUrl, setMintUrl] = useState(MINTS[0]);
   const [amount, setAmount] = useState("2");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -55,11 +57,11 @@ export default function PlaceBetModal({
   const signer = useSigner();
   const toast = useToast();
 
-  const handleSubmit: React.FormEventHandler = async (e) => {
+  const createInvoice: React.FormEventHandler = async (e) => {
     e.preventDefault();
 
     setLoading(true);
-    const wallet = await getWallet(DEFAULT_MINT);
+    const wallet = await getWallet(mintUrl);
     const intAmount = parseInt(amount);
     if (!Number.isInteger(intAmount)) throw new Error("Failed to parse amount");
     const request = await wallet.requestMint(intAmount);
@@ -77,7 +79,7 @@ export default function PlaceBetModal({
     try {
       setLoading(true);
 
-      const wallet = await getWallet(DEFAULT_MINT);
+      const wallet = await getWallet(mintUrl);
       const proofs = await wallet.requestTokens(
         mintRequest.amount,
         mintRequest.hash
@@ -151,8 +153,23 @@ export default function PlaceBetModal({
     );
   } else {
     content = (
-      <form onSubmit={handleSubmit}>
-        <FormControl>
+      <form onSubmit={createInvoice}>
+        <FormControl isRequired>
+          <FormLabel>Mint</FormLabel>
+          <Select
+            placeholder="Select mint"
+            isRequired
+            value={mintUrl}
+            onChange={(e) => setMintUrl(e.target.value)}
+          >
+            {MINTS.map((mintUrl) => (
+              <option key={mintUrl} value={mintUrl}>
+                {mintUrl}
+              </option>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl mt="2">
           <FormLabel>Amount</FormLabel>
           <NumberInput value={amount} onChange={(e) => setAmount(e)}>
             <NumberInputField />

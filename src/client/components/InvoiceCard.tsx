@@ -20,7 +20,7 @@ export function InvoiceCard({ invoice }: { invoice: string }) {
           <QrCodeSvg content={invoice} />
           <LinkOverlay href={`lightning:${invoice}`} />
         </LinkBox>
-        <Flex gap="2" w="100%">
+        <Flex gap="2" w="100%" mt="2">
           <Input readOnly value={invoice} />
           <CopyIconButton text={invoice} aria-label="Copy invoice" />
         </Flex>

@@ -113,7 +113,9 @@ function CurrentChallenges() {
           maxW="sm"
           mt="4"
           pubkey={normalizeToHex(invite)}
-          onCreateGame={() => setInvite("")}
+          onCreateGame={(event) => {
+            window.location.hash = event.id;
+          }}
         />
       )}
 

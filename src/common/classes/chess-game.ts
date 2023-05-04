@@ -3,7 +3,7 @@ import Game from "./game.js";
 import { Chess, Color } from "chess.js";
 import { GameEventKinds, GameTypes } from "../const.js";
 import dayjs from "dayjs";
-import { StateTypes } from "../event-helpers.js";
+import { StateTypes } from "../helpers/event-helpers.js";
 
 export default class ChessGame extends Game {
   chess: Chess;

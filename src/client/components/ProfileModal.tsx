@@ -22,6 +22,7 @@ import QrCodeSvg from "./QrCodeSvg";
 import useUserMetadata from "../hooks/useUserMetadata";
 import { useEffect, useState } from "react";
 import { CopyIconButton } from "./CopyIconButton";
+import Username from "./Username";
 
 export default function ProfileModal({
   isOpen,
@@ -53,7 +54,6 @@ export default function ProfileModal({
           {window.nostr && !auth.nip07 && (
             <Button
               colorScheme="purple"
-              variant="outline"
               onClick={() => auth.loginWithNip07()}
               w="full"
             >
@@ -61,13 +61,13 @@ export default function ProfileModal({
             </Button>
           )}
           {auth.nip07 && (
-            <Alert status="warning">
+            <Alert status="success" whiteSpace="pre">
               <AlertIcon />
-              Profile editing is disabled because you are using a browser
-              extension
+              <span>Logged in as </span>
+              <Username pubkey={auth.pubkey} />
             </Alert>
           )}
-          <FormControl my="2">
+          {/* <FormControl my="2">
             <FormLabel>Username</FormLabel>
             <Input
               placeholder="Name"
@@ -75,15 +75,20 @@ export default function ProfileModal({
               onChange={(e) => setDisplayName(e.target.value)}
               readOnly
             />
-          </FormControl>
+          </FormControl> */}
 
-          <Heading mt="2" size="lg">
+          <Heading my="2" size="lg">
             Pubkey
           </Heading>
           <QrCodeSvg content={auth.pubkey} border={1} />
-          <Flex>
-            <Input value={auth.pubkey} readOnly />
+          <Flex mt="2">
+            <Input value={auth.pubkey} readOnly mr="2" />
             <CopyIconButton text={auth.pubkey} aria-label="Copy pubkey" />
+          </Flex>
+          <Flex justifyContent="center">
+            <Button mt="4" w="2xs" onClick={onClose}>
+              Close
+            </Button>
           </Flex>
         </ModalBody>
       </ModalContent>

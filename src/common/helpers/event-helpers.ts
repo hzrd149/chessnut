@@ -1,6 +1,6 @@
 import { Proof } from "@cashu/cashu-ts";
 import { Event } from "nostr-tools";
-import { GameEventKinds } from "./const.js";
+import { GameEventKinds } from "../const.js";
 
 export enum StateTypes {
   Move = "move",
@@ -52,9 +52,9 @@ export function parseStateEvent(event: Event): ParsedState {
 export type ParsedBet = {
   id: string;
   player: string;
-  amount: number;
-  proofs: Proof[];
   game: string;
+  amount: number;
+  mint: string;
 };
 
 export function parseBetEvent(event: Event): ParsedBet {
@@ -67,17 +67,17 @@ export function parseBetEvent(event: Event): ParsedBet {
   const player = event.tags.find((t) => t[0] === "p" && t[3] === "player")?.[1];
   if (!player) throw new Error("missing player");
 
-  const proofsStr = event.tags.find((t) => t[0] === "proofs")?.[1];
-  if (!proofsStr) throw new Error("missing proofs");
+  const amount = event.tags.find((t) => t[0] === "amount")?.[1];
+  if (!amount) throw new Error("missing amount");
 
-  const proofs = JSON.parse(proofsStr) as Proof[];
-  const amount = proofs.reduce((a, proof) => a + proof.amount, 0);
+  const mint = event.tags.find((t) => t[0] === "mint")?.[1];
+  if (!mint) throw new Error("missing mint");
 
   return {
     id: event.id,
     player,
-    proofs,
     game,
-    amount,
+    amount: parseInt(amount),
+    mint,
   };
 }

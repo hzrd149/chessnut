@@ -6,7 +6,7 @@ import {
   ParsedState,
   parseBetEvent,
   parseStateEvent,
-} from "../event-helpers.js";
+} from "../helpers/event-helpers.js";
 import { ensureConnected, getRelay } from "../services/relays.js";
 
 export default class Game {
@@ -93,7 +93,7 @@ export default class Game {
     try {
       const bet = parseBetEvent(event);
       this.bets.set(bet.id, bet);
-      this.onBet.notify()
+      this.onBet.notify();
     } catch (e) {
       console.log("Failed to handle bet event", event);
       console.log(e);

@@ -25,6 +25,8 @@ sub.on("event", async (event) => {
   switch (event.kind as number) {
     case GameEventKinds.PlaceBet:
       try {
+        console.log(`Received place bet from ${event.pubkey}`);
+
         await handlePlaceBetEvent(event);
       } catch (e) {
         console.log(`Failed to handle place bet event ${event.id}`);
@@ -50,6 +52,8 @@ function shutdown() {
   console.log("\n");
   console.log("Shutting down");
   unloadAllGames();
+
+  process.exit(0);
 }
 process.on("SIGTERM", shutdown);
 process.on("SIGINT", shutdown);

@@ -79,7 +79,7 @@ erDiagram
         string player "[p, player] player who create the bet"
         int amount "[value, int] value in sats"
         string game "[e, game, r, 'game']"
-        string proofs "[proofs, JSON.stringify(proofs)] tokens with only proofs (NUT-07)"
+        string mint "[mint, mint url] the url of the mint"
     }
     BET ||--|| MODERATOR : author
     BET ||--|| PLAYER : player

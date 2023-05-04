@@ -21,12 +21,13 @@ import { useSigner } from "../../hooks/useSigner";
 import { GameTypes } from "../../../common/const";
 import { MODERATOR_PUBKEY, RELAY_URL } from "../../const";
 import { buildDraftGameEvent } from "../../helpers/events";
+import { Event } from "nostr-tools";
 
 export default function InviteCard({
   pubkey,
   onCreateGame,
   ...props
-}: { pubkey: string; onCreateGame?: () => void } & CardProps) {
+}: { pubkey: string; onCreateGame?: (event: Event) => void } & CardProps) {
   const auth = useAuth();
   const signer = useSigner();
   const toast = useToast();
@@ -51,7 +52,7 @@ export default function InviteCard({
       const pub = relay.publish(signed);
       pub.on("ok", () => {
         toast({ status: "success", title: "Created game" });
-        if (onCreateGame) onCreateGame();
+        if (onCreateGame) onCreateGame(signed);
       });
       pub.on("failed", () =>
         toast({ status: "error", title: "Failed to create game" })
