@@ -47,7 +47,7 @@ export default class ChessGame extends Game {
         ["move", [from, to].join("-")],
         ["state", this.chess.fen()],
         ["e", this.id, this.relay, "game"],
-        ["e", this.getHeadState()?.id ?? this.id, this.relay, "previous"],
+        ["e", this.getHeadId(), this.relay, "previous"],
         ["p", this.moderator, this.relay, "moderator"],
       ],
     };
@@ -55,5 +55,17 @@ export default class ChessGame extends Game {
     this.chess.undo();
 
     return draft;
+  }
+
+  getWinner() {
+    const winner = super.getWinner();
+
+    if (winner) return winner;
+
+    if (this.chess.isCheckmate()) {
+      const turn = this.chess.turn();
+      if (turn === this.getPlayerColor(this.playerA)) return this.playerB;
+      if (turn === this.getPlayerColor(this.playerB)) return this.playerA;
+    }
   }
 }

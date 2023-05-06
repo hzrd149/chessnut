@@ -24,16 +24,17 @@ export default function Chessboard({ game, onMove }: ChessboardProps) {
   const isSpectator =
     auth.pubkey !== game.playerA && auth.pubkey !== game.playerB;
 
-  const lastMove = game.getHeadState()?.move?.split("-") as
+  const lastMove = game.getLastMove()?.split("-") as
     | ChessgroundConfig["lastMove"]
     | undefined;
+
   const config: ChessgroundConfig = {
-    fen: game.getHeadState()?.state ?? game.state,
+    fen: game.chess.fen(),
     movable: {
       free: false,
       color: undefined,
     },
-    viewOnly: isSpectator,
+    viewOnly: isSpectator || game.isOver,
     lastMove,
     turnColor: game.chess.turn() === "w" ? "white" : "black",
     highlight: {

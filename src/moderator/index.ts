@@ -1,9 +1,10 @@
 import "dotenv/config.js";
-import { ensureConnected, getRelay } from "./relays.js";
+import { getRelay } from "./relays.js";
 import { getPubkey } from "./keys.js";
 import { GameEventKinds } from "../common/const.js";
-import { getGameFromId, handleGameEvent, unloadAllGames } from "./games.js";
+import { handleGameEvent, unloadAllGames } from "./games.js";
 import { handlePlaceBetEvent } from "./bets.js";
+import { ensureConnected } from "../common/helpers/relays.js";
 
 import crypto from "node:crypto";
 // @ts-ignore
@@ -19,9 +20,6 @@ console.log(`Pubkey: ${getPubkey()}`);
 const sub = relay.sub([{ "#p": [getPubkey()] }]);
 
 sub.on("event", async (event) => {
-  const gameId = event.tags.find((t) => t[0] === "e" && t[1])?.[1];
-  if (!gameId) return;
-
   switch (event.kind as number) {
     case GameEventKinds.PlaceBet:
       try {
@@ -36,15 +34,8 @@ sub.on("event", async (event) => {
     case GameEventKinds.Game:
       // start watching the game
       const game = handleGameEvent(event);
-      game.load();
+      await game.load();
       break;
-  }
-  if ((event.kind as number) === GameEventKinds.PlaceBet) {
-    const game = await getGameFromId(gameId);
-    await game.load();
-  } else {
-    // load the game
-    getGameFromId(gameId);
   }
 });
 

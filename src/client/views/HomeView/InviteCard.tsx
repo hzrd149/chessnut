@@ -16,12 +16,13 @@ import { useAuth } from "../../AuthProvider";
 import UserAvatar from "../../components/UserAvatar";
 import useUserMetadata from "../../hooks/useUserMetadata";
 import { useState } from "react";
-import { ensureConnected, getRelay } from "../../../common/services/relays";
+import { getRelay } from "../../../common/services/relays";
 import { useSigner } from "../../hooks/useSigner";
 import { GameTypes } from "../../../common/const";
 import { MODERATOR_PUBKEY, RELAY_URL } from "../../const";
 import { buildDraftGameEvent } from "../../helpers/events";
 import { Event } from "nostr-tools";
+import { ensureConnected, waitForPub } from "../../../common/helpers/relays";
 
 export default function InviteCard({
   pubkey,
@@ -50,13 +51,9 @@ export default function InviteCard({
       const relay = getRelay(RELAY_URL);
       await ensureConnected(relay);
       const pub = relay.publish(signed);
-      pub.on("ok", () => {
-        toast({ status: "success", title: "Created game" });
-        if (onCreateGame) onCreateGame(signed);
-      });
-      pub.on("failed", () =>
-        toast({ status: "error", title: "Failed to create game" })
-      );
+      await waitForPub(pub);
+      toast({ status: "success", title: "Created game" });
+      if (onCreateGame) onCreateGame(signed);
     } catch (e) {
       if (e instanceof Error) {
         toast({ status: "error", description: e.message });

@@ -1,10 +1,11 @@
-import { ensureConnected, getRelay } from "../../common/services/relays";
+import { getRelay } from "../../common/services/relays";
 import { Sub } from "nostr-tools";
 import { RELAY_URL } from "../const";
 import Signal from "../../common/classes/signal";
 import { GameEventKinds } from "../../common/const";
 import ChessGame from "../../common/classes/chess-game";
 import createGameClass from "../../common/helpers/create-game";
+import { ensureConnected } from "../../common/helpers/relays";
 
 const games = new Map<string, ChessGame>();
 const subs = new Map<string, Sub>();

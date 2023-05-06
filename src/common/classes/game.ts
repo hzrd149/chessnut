@@ -3,11 +3,14 @@ import Signal from "./signal.js";
 import { GameEventKinds, GameTypes } from "../const.js";
 import {
   ParsedBet,
+  ParsedFinish,
   ParsedState,
   parseBetEvent,
+  parseFinishEvent,
   parseStateEvent,
 } from "../helpers/event-helpers.js";
-import { ensureConnected, getRelay } from "../services/relays.js";
+import { getRelay } from "../services/relays.js";
+import { ensureConnected } from "../helpers/relays.js";
 
 export default class Game {
   id: string;
@@ -21,7 +24,7 @@ export default class Game {
   state: string;
 
   rootEvent: Event;
-  finish?: Event;
+  finish?: ParsedFinish;
   states = new Map<string, ParsedState>();
   stateForwardRef = new Map<string, string[]>();
   bets = new Map<string, ParsedBet>();
@@ -34,6 +37,13 @@ export default class Game {
   onLoad = new Signal();
   onState = new Signal();
   onBet = new Signal();
+
+  get isForfeit() {
+    return !!this.getForfeit();
+  }
+  get isOver() {
+    return this.isForfeit || !!this.finish || !!this.getWinner();
+  }
 
   constructor(event: Event) {
     if ((event.kind as number) !== GameEventKinds.Game)
@@ -83,8 +93,8 @@ export default class Game {
       this.stateForwardRef.set(state.previous, refs.concat(state.id));
       this.onState.notify();
     } catch (e) {
-      console.log("failed to handle state", event);
-      console.log(e);
+      if (e instanceof Error)
+        console.log("Failed to handle state", event.id, e.message);
     }
   }
   handleBetEvent(event: Event) {
@@ -95,8 +105,8 @@ export default class Game {
       this.bets.set(bet.id, bet);
       this.onBet.notify();
     } catch (e) {
-      console.log("Failed to handle bet event", event);
-      console.log(e);
+      if (e instanceof Error)
+        console.log("Failed to handle bet event", event.id, e.message);
     }
   }
 
@@ -129,7 +139,35 @@ export default class Game {
     }
   }
 
-  getTotalBets() {
+  getLastMove() {
+    let state = this.getHeadState();
+    while (!!state) {
+      if (state?.move) return state.move;
+      if (state?.previous) {
+        state = this.states.get(state.previous);
+      } else return;
+    }
+  }
+  getForfeit() {
+    let state = this.getHeadState();
+    while (!!state) {
+      if (state?.type === "forfeit") return state;
+      if (state?.previous) {
+        state = this.states.get(state.previous);
+      } else return;
+    }
+  }
+  getWinner() {
+    const forfeit = this.getForfeit();
+    if (forfeit?.author === this.playerA) return this.playerB;
+    if (forfeit?.author === this.playerB) return this.playerA;
+  }
+
+  getHeadId() {
+    return this.getHeadState()?.id ?? this.id;
+  }
+
+  getPlayerBets() {
     const betsByPlayer: Record<string, number> = {};
 
     for (const [id, bet] of this.bets) {
@@ -138,6 +176,16 @@ export default class Game {
     }
 
     return betsByPlayer;
+  }
+  getTotalBets() {
+    let total = 0;
+
+    for (const [id, bet] of this.bets) {
+      if (!bet.amount) continue;
+      total += bet.amount;
+    }
+
+    return total;
   }
 
   async load() {
@@ -165,7 +213,7 @@ export default class Game {
             this.handleBetEvent(event);
             break;
           case 2503:
-            this.finish = event;
+            this.finish = parseFinishEvent(event);
             break;
         }
       });

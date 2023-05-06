@@ -27,14 +27,11 @@ import { InvoiceCard } from "./InvoiceCard";
 import { getEncodedToken } from "@cashu/cashu-ts";
 import { useNip04Tools } from "../hooks/useNip04Tools";
 import { useSigner } from "../hooks/useSigner";
-import {
-  ensureConnected,
-  getRelay,
-  waitForPub,
-} from "../../common/services/relays";
+import { getRelay } from "../../common/services/relays";
 import Game from "../../common/classes/game";
 import { buildPlaceBetEvent } from "../helpers/events";
 import { CheckInCircle } from "./Icons";
+import { ensureConnected, waitForPub } from "../../common/helpers/relays";
 
 type MintRequest = {
   amount: number;
@@ -48,7 +45,9 @@ export default function PlaceBetModal({
   ...props
 }: { game: Game } & Omit<ModalProps, "children">) {
   const [mintRequest, setMintRequest] = useState<MintRequest>();
-  const [mintUrl, setMintUrl] = useState("https://8333.space:3338");
+  const [mintUrl, setMintUrl] = useState(
+    "https://legend.lnbits.com/cashu/api/v1/XHaox6CSQLxTJeAh7fyT7m"
+  );
   const [amount, setAmount] = useState("2");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -106,6 +105,7 @@ export default function PlaceBetModal({
         setSuccess(true);
         game.onBet.off(listener);
         window.clearTimeout(timeout);
+        setLoading(false);
       };
 
       game.onBet.on(listener);
@@ -114,8 +114,8 @@ export default function PlaceBetModal({
         toast({ status: "error", description: e.message });
         console.log(e);
       }
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   let content = <Spinner />;
@@ -161,11 +161,11 @@ export default function PlaceBetModal({
             value={mintUrl}
             onChange={(e) => setMintUrl(e.target.value)}
           >
+            <option value="https://legend.lnbits.com/cashu/api/v1/XHaox6CSQLxTJeAh7fyT7m">
+              Chessnut - LNbits
+            </option>
             <option value="https://8333.space:3338">
               https://8333.space:3338
-            </option>
-            <option value="https://lnbits.semisol.dev/cashu/api/v1/TEUcc6GN4dEsh6wa6J2hSu">
-              https://lnbits.semisol.dev/cashu/api/v1/TEUcc6GN4dEsh6wa6J2hSu
             </option>
           </Select>
         </FormControl>

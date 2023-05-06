@@ -1,4 +1,5 @@
-import { ensureConnected, getRelay } from "../../common/services/relays";
+import { ensureConnected } from "../../common/helpers/relays";
+import { getRelay } from "../../common/services/relays";
 import { RELAY_URL } from "../const";
 
 export type Metadata = {

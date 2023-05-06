@@ -12,7 +12,7 @@ import {
   getPublicKey,
   finishEvent,
 } from "nostr-tools";
-import { ensureConnected, getRelay } from "../common/services/relays";
+import { getRelay } from "../common/services/relays";
 import {
   uniqueNamesGenerator,
   adjectives,
@@ -21,6 +21,7 @@ import {
 } from "unique-names-generator";
 import dayjs from "dayjs";
 import { RELAY_URL } from "./const";
+import { ensureConnected } from "../common/helpers/relays";
 
 async function publishInitialMetadata(secKey: string) {
   const relay = getRelay(RELAY_URL);

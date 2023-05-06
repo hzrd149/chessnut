@@ -13,8 +13,3 @@ export function getRelay(url: string) {
   }
   return relays.get(url) as Relay;
 }
-export async function ensureConnected(relay: Relay) {
-  if (relay.status !== WebSocket.OPEN) {
-    await relay.connect();
-  }
-}

@@ -2,16 +2,13 @@ import { Event, EventTemplate, finishEvent, nip04 } from "nostr-tools";
 import { getWallet } from "./cashu.js";
 import { getSecKey } from "./keys.js";
 import { getDecodedToken, getEncodedToken } from "@cashu/cashu-ts";
-import { getGameFromId } from "./games.js";
+import { loadGame } from "./games.js";
 import { saveFullTokenForBet } from "./db.js";
 import type { Token } from "@cashu/cashu-ts/dist/lib/es5/model/types";
 import dayjs from "dayjs";
 import { GameEventKinds } from "../common/const.js";
-import {
-  getRelay,
-  ensureConnected,
-  waitForPub,
-} from "../common/services/relays.js";
+import { getRelay } from "../common/services/relays.js";
+import { ensureConnected, waitForPub } from "../common/helpers/relays.js";
 
 const missing = (msg: string) => {
   throw new Error(msg);
@@ -26,7 +23,7 @@ export async function handlePlaceBetEvent(event: Event) {
     event.tags.find((t) => t[0] === "cashu")?.[1] ||
     missing("event missing cashu tokens");
 
-  const game = await getGameFromId(gameId);
+  const game = await loadGame(gameId);
   if (game.finish) throw new Error("game finished");
 
   // decrypt the cashu tokens

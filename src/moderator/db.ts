@@ -12,5 +12,5 @@ export async function saveFullTokenForBet(betId: string, token: string) {
   await db.set(betId, token);
 }
 export async function getFullTokenForBet(betId: string) {
-  return await db.get(betId);
+  return (await db.get(betId)) as Promise<string | undefined>;
 }

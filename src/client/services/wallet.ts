@@ -1,14 +1,11 @@
 import { Token } from "@cashu/cashu-ts/dist/lib/es5/model/types";
-import {
-  ensureConnected,
-  getRelay,
-  waitForPub,
-} from "../../common/services/relays";
+import { getRelay } from "../../common/services/relays";
 import { RELAY_URL } from "../const";
 import Signal from "../../common/classes/signal";
 import { Event, EventTemplate } from "nostr-tools";
 import dayjs from "dayjs";
 import { getDecodedToken } from "@cashu/cashu-ts";
+import { ensureConnected, waitForPub } from "../../common/helpers/relays";
 
 const tokens = new Set<Token>();
 

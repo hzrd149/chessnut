@@ -1,16 +1,21 @@
-import { Proof } from "@cashu/cashu-ts";
 import { Event } from "nostr-tools";
 import { GameEventKinds } from "../const.js";
 
+const getGameId = (event: Event) =>
+  event.tags.find((t) => t[0] === "e" && t[3] === "game")?.[1];
+
 export enum StateTypes {
   Move = "move",
+  Forfeit = "forfeit",
+  Draw = "draw",
 }
 
 export type ParsedState = {
   id: string;
   author: string;
   kind: number;
-  state: string;
+  game: string;
+  state?: string;
   type: StateTypes;
   previous: string;
   move?: string;
@@ -26,8 +31,10 @@ export function parseStateEvent(event: Event): ParsedState {
     | undefined;
   if (!type) throw new Error("missing type");
 
+  const game = getGameId(event);
+  if (!game) throw new Error("missing game");
+
   const stateStr = event.tags.find((t) => t[0] === "state")?.[1];
-  if (!stateStr) throw new Error("missing state");
 
   const previous = event.tags.find(
     (t) => t[0] === "e" && t[3] === "previous"
@@ -35,12 +42,12 @@ export function parseStateEvent(event: Event): ParsedState {
   if (!previous) throw new Error("missing previous");
 
   const move = event.tags.find((t) => t[0] === "move")?.[1];
-  if (!move) throw new Error("missing moved");
 
   return {
     id: event.id,
     author: event.pubkey,
     kind: event.kind as number,
+    game,
     state: stateStr,
     type,
     previous,
@@ -61,7 +68,7 @@ export function parseBetEvent(event: Event): ParsedBet {
   if ((event.kind as number) !== GameEventKinds.Bet)
     throw new Error("event is not a bet event");
 
-  const game = event.tags.find((t) => t[0] === "e" && t[3] === "game")?.[1];
+  const game = getGameId(event);
   if (!game) throw new Error("missing game");
 
   const player = event.tags.find((t) => t[0] === "p" && t[3] === "player")?.[1];
@@ -79,5 +86,46 @@ export function parseBetEvent(event: Event): ParsedBet {
     game,
     amount: parseInt(amount),
     mint,
+  };
+}
+
+export type ParsedFinish = {
+  id: string;
+  winner: string;
+  looser: string;
+  game: string;
+  author: string;
+  rewards: Record<string, string>;
+};
+
+export function parseFinishEvent(event: Event): ParsedFinish {
+  if ((event.kind as number) !== GameEventKinds.Finish)
+    throw new Error("event is not a finish event");
+
+  const game = getGameId(event);
+  if (!game) throw new Error("missing game");
+
+  const winner = event.tags.find((t) => t[0] === "p" && t[3] === "winner")?.[1];
+  if (!winner) throw new Error("missing winner");
+
+  const looser = event.tags.find((t) => t[0] === "p" && t[3] === "looser")?.[1];
+  if (!looser) throw new Error("missing looser");
+
+  const rewards: Record<string, string> = {};
+  event.tags
+    .filter((t) => t[0] === "cashu")
+    .map((t) => {
+      if (t[1] && t[2]) {
+        rewards[t[2]] = t[1];
+      }
+    });
+
+  return {
+    id: event.id,
+    author: event.pubkey,
+    game,
+    winner,
+    looser,
+    rewards,
   };
 }

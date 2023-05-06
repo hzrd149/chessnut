@@ -1,5 +1,4 @@
 import { useAsync, useHash, useSearchParam } from "react-use";
-import useSingleEvent from "../../hooks/useSingleEvent";
 import {
   AspectRatio,
   Button,
@@ -16,15 +15,16 @@ import { withErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "../../components/ErrorBoundary";
 import UserAvatar from "../../components/UserAvatar";
 import Chessboard, { ChessboardProps } from "./Chessboard";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect } from "react";
 import useSignal from "../../hooks/useSignal";
-import ChessGame from "../../../common/classes/chess-game";
 import { useSigner } from "../../hooks/useSigner";
-import { ensureConnected, getRelay } from "../../../common/services/relays";
+import { getRelay } from "../../../common/services/relays";
 import PlaceBetModal from "../../components/PlaceBetModal";
-import { RELAY_URL } from "../../const";
 import { useAuth } from "../../AuthProvider";
 import { loadGameById } from "../../services/games";
+import ForFeitModal from "./ForfeitModal";
+import { ensureConnected, waitForPub } from "../../../common/helpers/relays";
+import RewardModal from "../../components/RewardModal";
 
 function GameView() {
   const auth = useAuth();
@@ -38,6 +38,8 @@ function GameView() {
     onClose: closePlaceBet,
     onOpen: openPlaceBet,
   } = useDisclosure();
+  const forfeitModal = useDisclosure();
+  const rewardModal = useDisclosure();
 
   if (!gameId) return <Heading>Missing game id</Heading>;
 
@@ -75,10 +77,8 @@ function GameView() {
         const relay = getRelay(game.relay);
         await ensureConnected(relay);
         const pub = relay.publish(event);
-
-        pub.on("ok", () => {
-          game.handleStateEvent(event);
-        });
+        await waitForPub(pub);
+        game.handleStateEvent(event);
       } catch (e) {
         if (e instanceof Error) {
           toast({ status: "error", description: e.message });
@@ -93,7 +93,7 @@ function GameView() {
 
   const isSpectator =
     auth.pubkey !== game.playerA && auth.pubkey !== game.playerB;
-  const bets = game.getTotalBets();
+  const playerBets = game.getPlayerBets();
 
   return (
     <>
@@ -107,22 +107,41 @@ function GameView() {
         <AspectRatio w="full" ratio={1}>
           <Chessboard game={game} onMove={handleMove} />
         </AspectRatio>
-        <ButtonGroup w="full">
-          <Button flex={2} colorScheme="purple" onClick={openPlaceBet}>
-            Place bet
-          </Button>
-          <Button flex={1} variant="outline" colorScheme="blue">
-            Draw
-          </Button>
-          <Button flex={1} variant="outline" colorScheme="red">
-            Forfeit
-          </Button>
-        </ButtonGroup>
+        {game.isOver && game.getWinner() === auth.pubkey ? (
+          <ButtonGroup w="full">
+            <Button flex={1} colorScheme="purple" onClick={rewardModal.onOpen}>
+              Collect reward
+            </Button>
+          </ButtonGroup>
+        ) : (
+          <ButtonGroup w="full">
+            <Button
+              flex={2}
+              colorScheme="purple"
+              onClick={openPlaceBet}
+              isDisabled={game.isOver}
+            >
+              Place bet
+            </Button>
+            <Button flex={1} variant="outline" colorScheme="blue" isDisabled>
+              Draw
+            </Button>
+            <Button
+              flex={1}
+              variant="outline"
+              colorScheme="red"
+              onClick={forfeitModal.onOpen}
+              isDisabled={game.isOver}
+            >
+              Forfeit
+            </Button>
+          </ButtonGroup>
+        )}
         <Flex gap="2" alignItems="center">
           <UserAvatar pubkey={game.playerA} size="md" />
-          <Text>{bets[game.playerA]} sats</Text>
+          <Text>{playerBets[game.playerA]} sats</Text>
           <Spacer />
-          <Text>{bets[game.playerB]} sats</Text>
+          <Text>{playerBets[game.playerB]} sats</Text>
           <UserAvatar pubkey={game.playerB} size="md" />
         </Flex>
       </Flex>
@@ -131,6 +150,21 @@ function GameView() {
           game={game}
           isOpen={placeBetOpen}
           onClose={closePlaceBet}
+        />
+      )}
+      {forfeitModal.isOpen && (
+        <ForFeitModal
+          isOpen={forfeitModal.isOpen}
+          onClose={forfeitModal.onClose}
+          game={game}
+          onForfeit={forfeitModal.onClose}
+        />
+      )}
+      {rewardModal.isOpen && (
+        <RewardModal
+          isOpen={rewardModal.isOpen}
+          onClose={rewardModal.onClose}
+          game={game}
         />
       )}
     </>

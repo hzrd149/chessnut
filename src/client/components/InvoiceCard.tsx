@@ -1,13 +1,10 @@
 import {
-  Box,
   Card,
   CardBody,
   Flex,
   Input,
-  Link,
   LinkBox,
   LinkOverlay,
-  Spinner,
 } from "@chakra-ui/react";
 import QrCodeSvg from "./QrCodeSvg";
 import { CopyIconButton } from "./CopyIconButton";

@@ -4,6 +4,7 @@ import { RELAY_URL } from "../const";
 import { DEFAULT_POSITION } from "chess.js";
 import dayjs from "dayjs";
 import Game from "../../common/classes/game";
+import { StateTypes } from "../../common/helpers/event-helpers";
 
 export function buildDraftGameEvent(
   type: GameTypes,
@@ -42,4 +43,18 @@ export function buildPlaceBetEvent(game: Game, token: string) {
   };
 
   return draft;
+}
+
+export function buildForfeitEvent(game: Game): EventTemplate {
+  return {
+    kind: GameEventKinds.State as number,
+    created_at: dayjs().unix(),
+    content: "",
+    tags: [
+      ["type", StateTypes.Forfeit],
+      ["e", game.id, game.relay, "game"],
+      ["p", game.moderator, game.relay, "moderator"],
+      ["e", game.getHeadId(), game.relay, "previous"],
+    ],
+  };
 }
