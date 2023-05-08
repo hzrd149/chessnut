@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  ButtonGroup,
   Card,
   CardBody,
   CardFooter,
@@ -8,6 +9,7 @@ import {
   CardProps,
   Flex,
   Heading,
+  Select,
   Text,
   Textarea,
   useToast,
@@ -20,7 +22,7 @@ import { getRelay } from "../../../common/services/relays";
 import { useSigner } from "../../hooks/useSigner";
 import { GameTypes } from "../../../common/const";
 import { MODERATOR_PUBKEY, RELAY_URL } from "../../const";
-import { buildDraftGameEvent } from "../../helpers/events";
+import { buildGameEvent } from "../../helpers/events";
 import { Event } from "nostr-tools";
 import { ensureConnected, waitForPub } from "../../../common/helpers/relays";
 
@@ -33,14 +35,15 @@ export default function InviteCard({
   const signer = useSigner();
   const toast = useToast();
   const metadata = useUserMetadata(pubkey);
-  const [message, setMessage] = useState("Play a chess game with me");
+  const [type, setType] = useState<GameTypes>(GameTypes.Chess);
+  const [message, setMessage] = useState("Play a game with me");
   const [loading, setLoading] = useState(false);
 
   const createGame = async () => {
     setLoading(true);
     try {
-      const draft = buildDraftGameEvent(
-        GameTypes.Chess,
+      const draft = buildGameEvent(
+        type,
         auth.pubkey,
         pubkey,
         message,
@@ -78,10 +81,29 @@ export default function InviteCard({
       </CardHeader>
 
       <CardBody py="0">
+        <ButtonGroup w="full" size="sm">
+          <Button
+            variant={type === GameTypes.Chess ? "solid" : "outline"}
+            onClick={() => setType(GameTypes.Chess)}
+            colorScheme="purple"
+            flex={1}
+          >
+            Chess
+          </Button>
+          <Button
+            variant={type === GameTypes.TicTacToe ? "solid" : "outline"}
+            onClick={() => setType(GameTypes.TicTacToe)}
+            colorScheme="purple"
+            flex={1}
+          >
+            Tic-Tac-Toe
+          </Button>
+        </ButtonGroup>
         <Textarea
           placeholder="Public message"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          mt="2"
         />
       </CardBody>
 

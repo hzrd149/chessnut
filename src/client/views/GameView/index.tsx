@@ -14,7 +14,7 @@ import {
 import { withErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "../../components/ErrorBoundary";
 import UserAvatar from "../../components/UserAvatar";
-import Chessboard, { ChessboardProps } from "./Chessboard";
+import Chessboard from "./Chessboard";
 import { useCallback, useEffect } from "react";
 import useSignal from "../../hooks/useSignal";
 import { useSigner } from "../../hooks/useSigner";
@@ -25,6 +25,10 @@ import { loadGameById } from "../../services/games";
 import ForFeitModal from "./ForfeitModal";
 import { ensureConnected, waitForPub } from "../../../common/helpers/relays";
 import RewardModal from "../../components/RewardModal";
+import { GameTypes } from "../../../common/const";
+import ChessGame from "../../../common/classes/chess-game";
+import TicTacToeGame from "../../../common/classes/tic-tac-toe-game";
+import TicTacToeBoard from "./TicTacToeBoard";
 
 function GameView() {
   const auth = useAuth();
@@ -67,12 +71,12 @@ function GameView() {
     }
   }, [game]);
 
-  const handleMove = useCallback<NonNullable<ChessboardProps["onMove"]>>(
-    async (from, to, capturedPiece) => {
+  const handleMove = useCallback(
+    async (move: string) => {
       if (!game) return;
 
       try {
-        const draft = game.makeMove(from, to);
+        const draft = game.buildMoveEvent(move);
         const event = await signer(draft);
         const relay = getRelay(game.relay);
         await ensureConnected(relay);
@@ -95,6 +99,17 @@ function GameView() {
     auth.pubkey !== game.playerA && auth.pubkey !== game.playerB;
   const playerBets = game.getPlayerBets();
 
+  const renderGameboard = () => {
+    switch (game.type) {
+      case GameTypes.Chess:
+        return <Chessboard game={game as ChessGame} onMove={handleMove} />;
+      case GameTypes.TicTacToe:
+        return (
+          <TicTacToeBoard game={game as TicTacToeGame} onMove={handleMove} />
+        );
+    }
+  };
+
   return (
     <>
       <Flex direction="column" gap="4" px="4" w="full" maxW="lg">
@@ -105,7 +120,7 @@ function GameView() {
           <UserAvatar pubkey={game.playerB} size="md" />
         </Flex>
         <AspectRatio w="full" ratio={1}>
-          <Chessboard game={game} onMove={handleMove} />
+          {renderGameboard()}
         </AspectRatio>
         {game.isOver && game.getWinner() === auth.pubkey ? (
           <ButtonGroup w="full">

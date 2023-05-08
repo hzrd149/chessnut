@@ -1,12 +1,12 @@
 import { EventTemplate } from "nostr-tools";
 import { GameEventKinds, GameTypes } from "../../common/const";
 import { RELAY_URL } from "../const";
-import { DEFAULT_POSITION } from "chess.js";
 import dayjs from "dayjs";
 import Game from "../../common/classes/game";
-import { StateTypes } from "../../common/helpers/event-helpers";
+import { StateTypes } from "../../common/helpers/parse-event";
+import { getDefaultState } from "../../common/helpers/create-game";
 
-export function buildDraftGameEvent(
+export function buildGameEvent(
   type: GameTypes,
   self: string,
   target: string,
@@ -21,7 +21,7 @@ export function buildDraftGameEvent(
       ["p", self, RELAY_URL, "playerA"],
       ["p", target, RELAY_URL, "playerB"],
       ["p", moderator, RELAY_URL, "moderator"],
-      ["state", DEFAULT_POSITION],
+      ["state", getDefaultState(type)],
       ["relay", RELAY_URL],
     ],
     created_at: dayjs().unix(),

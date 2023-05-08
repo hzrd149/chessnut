@@ -3,7 +3,7 @@ import Game from "./game.js";
 import { Chess, Color } from "chess.js";
 import { GameEventKinds, GameTypes } from "../const.js";
 import dayjs from "dayjs";
-import { StateTypes } from "../helpers/event-helpers.js";
+import { StateTypes } from "../helpers/parse-event.js";
 
 export default class ChessGame extends Game {
   chess: Chess;
@@ -18,7 +18,8 @@ export default class ChessGame extends Game {
       this.chess.reset();
       this.walkState((state) => {
         if (state.move) {
-          this.chess.move(state.move);
+          const [from, to] = state.move.split("-");
+          this.chess.move({ from, to, promotion: "q" });
         }
       });
     });
@@ -30,12 +31,13 @@ export default class ChessGame extends Game {
     throw new Error("unrecognized pubkey");
   }
 
-  move(from: string, to: string) {
+  move(moveStr: string) {
+    const [from, to] = moveStr.split("-");
     this.chess.move({ from, to, promotion: "q" });
-    this.onLoad.notify();
   }
 
-  makeMove(from: string, to: string) {
+  buildMoveEvent(moveStr: string) {
+    const [from, to] = moveStr.split("-");
     this.chess.move({ from, to, promotion: "q" });
 
     const draft: EventTemplate = {

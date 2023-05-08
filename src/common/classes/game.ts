@@ -8,7 +8,7 @@ import {
   parseBetEvent,
   parseFinishEvent,
   parseStateEvent,
-} from "../helpers/event-helpers.js";
+} from "../helpers/parse-event.js";
 import { getRelay } from "../services/relays.js";
 import { ensureConnected } from "../helpers/relays.js";
 

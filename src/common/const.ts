@@ -1,5 +1,6 @@
 export enum GameTypes {
   Chess = "chess",
+  TicTacToe = "tictactoe",
 }
 
 export enum GameEventKinds {

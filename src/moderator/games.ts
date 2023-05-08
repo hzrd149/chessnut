@@ -8,8 +8,9 @@ import { GameEventKinds } from "../common/const.js";
 import { getFullTokenForBet } from "./db.js";
 import { getSecKey } from "./keys.js";
 import { waitForPub, ensureConnected } from "../common/helpers/relays.js";
+import TicTacToeGame from "../common/classes/tic-tac-toe-game.js";
 
-const games = new Map<string, ChessGame>();
+const games = new Map<string, ChessGame | TicTacToeGame>();
 
 export function handleGameEvent(event: Event) {
   const game = createGameClass(event);
@@ -31,7 +32,7 @@ export async function loadGame(gameId: string) {
   return handleGameEvent(event);
 }
 
-async function checkGameState(game: ChessGame) {
+async function checkGameState(game: ChessGame | TicTacToeGame) {
   if (!game.loaded) return;
   if (game.finish) return;
 

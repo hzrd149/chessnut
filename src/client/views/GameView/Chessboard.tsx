@@ -8,11 +8,9 @@ import {
 import useSignal from "../../hooks/useSignal";
 import ChessGame from "../../../common/classes/chess-game";
 
-type onMove = NonNullable<NonNullable<ChessgroundConfig["events"]>["move"]>;
-
 export type ChessboardProps = {
   game: ChessGame;
-  onMove?: onMove;
+  onMove?: (move: string) => void;
 };
 
 export default function Chessboard({ game, onMove }: ChessboardProps) {
@@ -53,7 +51,11 @@ export default function Chessboard({ game, onMove }: ChessboardProps) {
       config.movable.showDests = true;
       config.movable.dests = chessJsMovesToDests(game.chess);
 
-      config.events = { move: onMove };
+      config.events = {
+        move: (from, to) => {
+          if (onMove) onMove(from + "-" + to);
+        },
+      };
     }
   }
 

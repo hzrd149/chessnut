@@ -17,6 +17,7 @@ import Game from "../../../common/classes/game";
 import useSignal from "../../hooks/useSignal";
 import { useAuth } from "../../AuthProvider";
 import RewardModal from "../../components/RewardModal";
+import { GameTypes } from "../../../common/const";
 
 export default function GameCard({
   game,
@@ -53,6 +54,9 @@ export default function GameCard({
           </Flex>
         </CardHeader>
         <CardBody py="0">
+          <Text>
+            Type: {game.type === GameTypes.Chess ? "Chess" : "Tic-Tac-Toe"}
+          </Text>
           <Text whiteSpace="pre">{game.message}</Text>
         </CardBody>
         <CardFooter>
