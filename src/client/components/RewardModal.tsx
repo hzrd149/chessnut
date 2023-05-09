@@ -83,6 +83,17 @@ export default function RewardModal({
         >
           wallet.nutstash.app
         </Button>
+        <Text>Or withdraw to a lightning wallet</Text>
+        <Button
+          as={Link}
+          target="_blank"
+          href="https://redeem.cashu.me/"
+          isExternal
+          variant="outline"
+          colorScheme="yellow"
+        >
+          redeem.cashu.me
+        </Button>
       </Flex>
     );
   } else if (reward && !tokens) {
