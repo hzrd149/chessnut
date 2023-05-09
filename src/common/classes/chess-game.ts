@@ -1,7 +1,7 @@
 import { Event, EventTemplate } from "nostr-tools";
 import Game from "./game.js";
 import { Chess, Color } from "chess.js";
-import { GameEventKinds, GameTypes } from "../const.js";
+import { GameEventKinds, GameTypes } from "../enum.js";
 import dayjs from "dayjs";
 import { StateTypes } from "../helpers/parse-event.js";
 
@@ -69,5 +69,8 @@ export default class ChessGame extends Game {
       if (turn === this.getPlayerColor(this.playerA)) return this.playerB;
       if (turn === this.getPlayerColor(this.playerB)) return this.playerA;
     }
+  }
+  isDraw(): boolean {
+    return this.chess.isDraw();
   }
 }

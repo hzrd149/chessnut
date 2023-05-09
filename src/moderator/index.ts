@@ -1,7 +1,7 @@
 import "dotenv/config.js";
 import { getRelay } from "./relays.js";
 import { getPubkey } from "./keys.js";
-import { GameEventKinds } from "../common/const.js";
+import { GameEventKinds } from "../common/enum.js";
 import { handleGameEvent, unloadAllGames } from "./games.js";
 import { handlePlaceBetEvent } from "./bets.js";
 import { ensureConnected } from "../common/helpers/relays.js";

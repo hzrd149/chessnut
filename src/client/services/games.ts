@@ -2,12 +2,12 @@ import { getRelay } from "../../common/services/relays";
 import { Sub } from "nostr-tools";
 import { RELAY_URL } from "../const";
 import Signal from "../../common/classes/signal";
-import { GameEventKinds } from "../../common/const";
-import ChessGame from "../../common/classes/chess-game";
+import { GameEventKinds } from "../../common/enum";
 import createGameClass from "../../common/helpers/create-game";
 import { ensureConnected } from "../../common/helpers/relays";
+import Game from "../../common/classes/game.js";
 
-const games = new Map<string, ChessGame>();
+const games = new Map<string, Game>();
 const subs = new Map<string, Sub>();
 
 export const onGamesChange = new Signal();

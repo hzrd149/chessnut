@@ -1,6 +1,6 @@
-import { Event, Sub } from "nostr-tools";
+import { Event, EventTemplate, Sub } from "nostr-tools";
 import Signal from "./signal.js";
-import { GameEventKinds, GameTypes } from "../const.js";
+import { GameEventKinds, GameTypes } from "../enum.js";
 import {
   ParsedBet,
   ParsedFinish,
@@ -37,6 +37,7 @@ export default class Game {
   onLoad = new Signal();
   onState = new Signal();
   onBet = new Signal();
+  onFinish = new Signal();
 
   get isForfeit() {
     return !!this.getForfeit();
@@ -109,6 +110,10 @@ export default class Game {
         console.log("Failed to handle bet event", event.id, e.message);
     }
   }
+  handleFinishEvent(event: Event) {
+    this.finish = parseFinishEvent(event);
+    this.onFinish.notify();
+  }
 
   walkState(fn: (state: ParsedState) => void) {
     let i = this.id;
@@ -162,6 +167,16 @@ export default class Game {
     if (forfeit?.author === this.playerA) return this.playerB;
     if (forfeit?.author === this.playerB) return this.playerA;
   }
+  isDraw() {
+    return false;
+  }
+  isPlayer(player: string) {
+    return player === this.playerA || player === this.playerB;
+  }
+
+  buildMoveEvent(move: string): EventTemplate {
+    throw new Error("needs to be overridden");
+  }
 
   getHeadId() {
     return this.getHeadState()?.id ?? this.id;
@@ -213,7 +228,7 @@ export default class Game {
             this.handleBetEvent(event);
             break;
           case 2503:
-            this.finish = parseFinishEvent(event);
+            this.handleFinishEvent(event);
             break;
         }
       });

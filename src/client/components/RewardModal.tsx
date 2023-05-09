@@ -27,7 +27,7 @@ export default function RewardModal({
   const auth = useAuth();
   const toast = useToast();
   const { decrypt } = useNip04Tools();
-  const [tokens, setTokens] = useState<string[]>([]);
+  const [tokens, setTokens] = useState<string[]>();
   const [loading, setLoading] = useState(false);
 
   const reward = game.finish?.rewards[auth.pubkey];
@@ -48,7 +48,7 @@ export default function RewardModal({
   };
 
   let content = <Text>Nothing to claim ¯\_(ツ)_/¯</Text>;
-  if (tokens.length > 0) {
+  if (tokens && tokens.length > 0) {
     content = (
       <Flex direction="column" gap="4">
         {tokens.map((token) => (
@@ -85,7 +85,7 @@ export default function RewardModal({
         </Button>
       </Flex>
     );
-  } else if (reward) {
+  } else if (reward && !tokens) {
     content = (
       <Button
         colorScheme="purple"

@@ -90,11 +90,11 @@ erDiagram
         int kind "2503"
         string author "moderator"
         string content ""
-        string reason "[reason, enum reason] (checkmate, branching, draw, invalid state)"
+        string reason "[reason, enum reason] (win, draw)"
         string game "[e, game, r, 'game']"
         string previous "[e, state id, r, 'previous'] (optional)"
-        string winner "[p, winner, r, 'winner']"
-        string looser "[p, looser, r, 'looser']"
+        string players "[p, player, r, 'player'] multiple p tags for all players"
+        string winner "[winner, player] (optional) the winning player"
         string cashu "[cashu, token, player] (encrypted for player) (can have multiple)"
     }
     FINISH ||--|| MODERATOR : author

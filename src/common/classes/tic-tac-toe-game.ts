@@ -1,6 +1,6 @@
 import { Event, EventTemplate } from "nostr-tools";
 import Game from "./game.js";
-import { GameEventKinds, GameTypes } from "../const.js";
+import { GameEventKinds, GameTypes } from "../enum.js";
 import { StateTypes } from "../helpers/parse-event.js";
 import dayjs from "dayjs";
 
@@ -79,6 +79,9 @@ export class TicTacToe {
       }
     }
   }
+  isDraw() {
+    return this.getWinner() === undefined ? !this.state.includes("H") : false;
+  }
 }
 
 export default class TicTacToeGame extends Game {
@@ -145,5 +148,8 @@ export default class TicTacToeGame extends Game {
       if (winningSymbol === this.getPlayerSymbol(this.playerB))
         return this.playerB;
     }
+  }
+  isDraw(): boolean {
+    return this.tictactoe.isDraw();
   }
 }

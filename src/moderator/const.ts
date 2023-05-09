@@ -3,4 +3,4 @@ const missing = (env: string) => {
 };
 
 export const RELAY_URL = process.env.RELAY_URL || missing("RELAY_URL");
-export const NOSTR_NSEC = process.env.NOSTR_NSEC || missing("NOSTR_NSEC");
+export const MOD_NSEC = process.env.MOD_NSEC || missing("MOD_NSEC");

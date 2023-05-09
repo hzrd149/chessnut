@@ -25,7 +25,7 @@ import { loadGameById } from "../../services/games";
 import ForFeitModal from "./ForfeitModal";
 import { ensureConnected, waitForPub } from "../../../common/helpers/relays";
 import RewardModal from "../../components/RewardModal";
-import { GameTypes } from "../../../common/const";
+import { GameTypes } from "../../../common/enum";
 import ChessGame from "../../../common/classes/chess-game";
 import TicTacToeGame from "../../../common/classes/tic-tac-toe-game";
 import TicTacToeBoard from "./TicTacToeBoard";
@@ -57,6 +57,7 @@ function GameView() {
   useSignal(game?.onLoad);
   useSignal(game?.onState);
   useSignal(game?.onBet);
+  useSignal(game?.onFinish);
 
   // load the game when the page mounts
   useEffect(() => {
@@ -110,6 +111,8 @@ function GameView() {
     }
   };
 
+  let hasRewards = !!game.finish?.rewards[auth.pubkey];
+
   return (
     <>
       <Flex direction="column" gap="4" px="4" w="full" maxW="lg">
@@ -119,10 +122,8 @@ function GameView() {
           <Text>VS</Text>
           <UserAvatar pubkey={game.playerB} size="md" />
         </Flex>
-        <AspectRatio w="full" ratio={1}>
-          {renderGameboard()}
-        </AspectRatio>
-        {game.isOver && game.getWinner() === auth.pubkey ? (
+        {renderGameboard()}
+        {game.isOver && hasRewards ? (
           <ButtonGroup w="full">
             <Button flex={1} colorScheme="purple" onClick={rewardModal.onOpen}>
               Collect reward

@@ -1,5 +1,5 @@
 import { Event } from "nostr-tools";
-import { GameTypes } from "../const.js";
+import { GameTypes } from "../enum.js";
 import ChessGame from "../classes/chess-game.js";
 import TicTacToeGame, { TicTacToe } from "../classes/tic-tac-toe-game.js";
 import { DEFAULT_POSITION } from "chess.js";

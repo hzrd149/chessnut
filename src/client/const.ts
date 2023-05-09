@@ -1,3 +1,11 @@
-export const RELAY_URL = "wss://nostrue.com";
-export const MODERATOR_PUBKEY =
-  "9bdfdd2a4998380e873d471866cfd56ee239ea19435394f247ecf5f0637a37c0";
+import { nip19 } from "nostr-tools";
+
+const VITE_RELAY_URL = import.meta.env.VITE_RELAY_URL;
+if (!VITE_RELAY_URL) throw new Error("Missing VITE_RELAY_URL");
+
+const VITE_MOD_NPUB = import.meta.env.VITE_MOD_NPUB;
+if (!VITE_MOD_NPUB) throw new Error("Missing VITE_MOD_NPUB");
+
+const MODERATOR_PUBKEY = nip19.decode(VITE_MOD_NPUB).data as string;
+
+export { VITE_RELAY_URL as RELAY_URL, MODERATOR_PUBKEY };

@@ -1,5 +1,5 @@
 import { Event } from "nostr-tools";
-import { GameEventKinds } from "../const.js";
+import { GameEventKinds, GameFinishReasons } from "../enum.js";
 
 const getGameId = (event: Event) =>
   event.tags.find((t) => t[0] === "e" && t[3] === "game")?.[1];
@@ -91,8 +91,9 @@ export function parseBetEvent(event: Event): ParsedBet {
 
 export type ParsedFinish = {
   id: string;
-  winner: string;
-  looser: string;
+  reason: GameFinishReasons;
+  players: string[];
+  winner?: string;
   game: string;
   author: string;
   rewards: Record<string, string>;
@@ -105,11 +106,17 @@ export function parseFinishEvent(event: Event): ParsedFinish {
   const game = getGameId(event);
   if (!game) throw new Error("missing game");
 
-  const winner = event.tags.find((t) => t[0] === "p" && t[3] === "winner")?.[1];
-  if (!winner) throw new Error("missing winner");
+  const reason = event.tags.find((t) => t[0] === "reason")?.[1] as
+    | GameFinishReasons
+    | undefined;
+  if (!reason) throw new Error("missing reason");
 
-  const looser = event.tags.find((t) => t[0] === "p" && t[3] === "looser")?.[1];
-  if (!looser) throw new Error("missing looser");
+  const players = event.tags
+    .filter((t) => t[0] === "p" && t[3] === "player")
+    .map((t) => t[1]);
+  if (players.length === 0) throw new Error("missing winner");
+
+  const winner = event.tags.find((t) => t[0] === "winner")?.[1];
 
   const rewards: Record<string, string> = {};
   event.tags
@@ -123,9 +130,10 @@ export function parseFinishEvent(event: Event): ParsedFinish {
   return {
     id: event.id,
     author: event.pubkey,
+    reason,
     game,
+    players,
     winner,
-    looser,
     rewards,
   };
 }

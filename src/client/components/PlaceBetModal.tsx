@@ -30,7 +30,7 @@ import { useSigner } from "../hooks/useSigner";
 import { getRelay } from "../../common/services/relays";
 import Game from "../../common/classes/game";
 import { buildPlaceBetEvent } from "../helpers/events";
-import { CheckInCircle } from "./Icons";
+import { CheckInCircleIcon } from "./Icons";
 import { ensureConnected, waitForPub } from "../../common/helpers/relays";
 
 type MintRequest = {
@@ -129,7 +129,7 @@ export default function PlaceBetModal({
         minH="sm"
         gap="4"
       >
-        <CheckInCircle fontSize="64" color="green" />
+        <CheckInCircleIcon fontSize="64" color="green" />
         <Heading size="md">Placed bet</Heading>
         <Button onClick={onClose}>Close</Button>
       </Flex>

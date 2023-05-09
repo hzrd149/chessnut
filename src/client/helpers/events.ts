@@ -1,5 +1,5 @@
 import { EventTemplate } from "nostr-tools";
-import { GameEventKinds, GameTypes } from "../../common/const";
+import { GameEventKinds, GameTypes } from "../../common/enum";
 import { RELAY_URL } from "../const";
 import dayjs from "dayjs";
 import Game from "../../common/classes/game";

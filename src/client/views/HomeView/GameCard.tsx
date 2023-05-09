@@ -17,7 +17,7 @@ import Game from "../../../common/classes/game";
 import useSignal from "../../hooks/useSignal";
 import { useAuth } from "../../AuthProvider";
 import RewardModal from "../../components/RewardModal";
-import { GameTypes } from "../../../common/const";
+import { GameTypes } from "../../../common/enum";
 
 export default function GameCard({
   game,

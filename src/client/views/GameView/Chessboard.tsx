@@ -7,6 +7,7 @@ import {
 } from "../../helpers/chess";
 import useSignal from "../../hooks/useSignal";
 import ChessGame from "../../../common/classes/chess-game";
+import { AspectRatio } from "@chakra-ui/react";
 
 export type ChessboardProps = {
   game: ChessGame;
@@ -59,5 +60,9 @@ export default function Chessboard({ game, onMove }: ChessboardProps) {
     }
   }
 
-  return <Chessground config={config} contained />;
+  return (
+    <AspectRatio ratio={1}>
+      <Chessground config={config} contained />
+    </AspectRatio>
+  );
 }

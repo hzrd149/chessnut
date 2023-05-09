@@ -6,7 +6,7 @@ import { loadGame } from "./games.js";
 import { saveFullTokenForBet } from "./db.js";
 import type { Token } from "@cashu/cashu-ts/dist/lib/es5/model/types";
 import dayjs from "dayjs";
-import { GameEventKinds } from "../common/const.js";
+import { GameEventKinds } from "../common/enum.js";
 import { getRelay } from "../common/services/relays.js";
 import { ensureConnected, waitForPub } from "../common/helpers/relays.js";
 

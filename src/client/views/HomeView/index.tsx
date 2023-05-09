@@ -28,9 +28,7 @@ function HomeView() {
   const filteredGames = useMemo(() => {
     switch (filter) {
       case "ongoing":
-        return games.filter((game) => !game.isOver && game.states.size > 0);
-      case "challenges":
-        return games.filter((game) => !game.isOver && game.states.size === 0);
+        return games.filter((game) => !game.isOver);
       case "finished":
         return games.filter((game) => !!game.isOver);
       default:
@@ -54,10 +52,9 @@ function HomeView() {
   const [invite, setInvite] = useState("");
 
   return (
-    <Flex direction="column" px="4">
+    <Flex direction="column" px="4" pb="24">
       <Select value={filter} onChange={(e) => setFilter(e.target.value)}>
         <option value="ongoing">On-going</option>
-        <option value="challenges">Challenges</option>
         <option value="finished">Finished</option>
       </Select>
       <FormControl display="flex" alignItems="center" mt="2">

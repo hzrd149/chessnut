@@ -20,7 +20,7 @@ import useUserMetadata from "../../hooks/useUserMetadata";
 import { useState } from "react";
 import { getRelay } from "../../../common/services/relays";
 import { useSigner } from "../../hooks/useSigner";
-import { GameTypes } from "../../../common/const";
+import { GameTypes } from "../../../common/enum";
 import { MODERATOR_PUBKEY, RELAY_URL } from "../../const";
 import { buildGameEvent } from "../../helpers/events";
 import { Event } from "nostr-tools";

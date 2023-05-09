@@ -1,11 +1,18 @@
 import { useAuth } from "../../AuthProvider";
 import useSignal from "../../hooks/useSignal";
 import TicTacToeGame from "../../../common/classes/tic-tac-toe-game";
-import { AspectRatio, Box, Grid, GridItem } from "@chakra-ui/react";
+import { Grid, IconButton } from "@chakra-ui/react";
+import { OIcon, XIcon } from "../../components/Icons";
 
 export type TicTacToeBoardProps = {
   game: TicTacToeGame;
   onMove?: (move: string) => void;
+};
+
+const indexToCords = (i: number) => {
+  const y = Math.floor(i / 3);
+  const x = i - y * 3;
+  return "" + x + y;
 };
 
 export default function TicTacToeBoard({ game, onMove }: TicTacToeBoardProps) {
@@ -14,51 +21,53 @@ export default function TicTacToeBoard({ game, onMove }: TicTacToeBoardProps) {
   useSignal(game.onLoad);
   useSignal(game.onState);
 
-  const isSpectator =
-    auth.pubkey !== game.playerA && auth.pubkey !== game.playerB;
+  const isPlayer = game.isPlayer(auth.pubkey);
 
   const lastMove = game.getLastMove();
+  const moves = game.tictactoe.moves();
 
-  // return (
-  //   <Grid
-  //     templateRows="repeat(3, 1fr)"
-  //     templateColumns="repeat(3, 1fr)"
-  //     gap="2"
-  //   >
-  //     {game.tictactoe.state
-  //       .slice(0, -1)
-  //       .split("")
-  //       .map((cell, i) => (
-  //         <GridItem key={i} rowSpan={1} colSpan={1} bg="tomato">
-  //           {cell}
-  //         </GridItem>
-  //       ))}
-  //   </Grid>
-  // );
+  const isClickable = (i: number) => {
+    if (!isPlayer || game.isOver) return false;
+    const symbol = game.getPlayerSymbol(auth.pubkey);
+    const move = indexToCords(i) + symbol;
+    return moves.includes(move);
+  };
+
+  const handleCellClick = (i: number) => {
+    if (!isPlayer) return;
+    const symbol = game.getPlayerSymbol(auth.pubkey);
+    const move = indexToCords(i) + symbol;
+
+    if (moves.includes(move) && onMove) {
+      onMove(move);
+    }
+  };
+
   return (
     <Grid
-      templateAreas={`"header header"
-                  "nav main"
-                  "nav footer"`}
-      gridTemplateRows={"50px 1fr 30px"}
-      gridTemplateColumns={"150px 1fr"}
-      h="200px"
-      gap="1"
-      color="blackAlpha.700"
-      fontWeight="bold"
+      templateRows="repeat(3, 1fr)"
+      templateColumns="repeat(3, 1fr)"
+      gap="2"
+      aspectRatio="1"
     >
-      <GridItem pl="2" bg="orange.300" area={"header"}>
-        Header
-      </GridItem>
-      <GridItem pl="2" bg="pink.300" area={"nav"}>
-        Nav
-      </GridItem>
-      <GridItem pl="2" bg="green.300" area={"main"}>
-        Main
-      </GridItem>
-      <GridItem pl="2" bg="blue.300" area={"footer"}>
-        Footer
-      </GridItem>
+      {game.tictactoe.state
+        .slice(0, -1)
+        .split("")
+        .map((cell, i) => (
+          <IconButton
+            key={i}
+            h="full"
+            icon={
+              cell === "X" ? <XIcon /> : cell === "O" ? <OIcon /> : undefined
+            }
+            fontSize="6rem"
+            borderWidth={1}
+            isDisabled={!isClickable(i)}
+            onClick={() => handleCellClick(i)}
+            colorScheme={lastMove?.includes(indexToCords(i)) ? "blue" : "gray"}
+            aria-label="Cell"
+          />
+        ))}
     </Grid>
   );
 }

@@ -10,3 +10,8 @@ export enum GameEventKinds {
   Bet = 2502,
   Finish = 2503,
 }
+
+export enum GameFinishReasons {
+  Win = "win",
+  Draw = "draw",
+}

@@ -1,8 +1,8 @@
 import { getPublicKey as nostrGetPubKey, nip19 } from "nostr-tools";
-import { NOSTR_NSEC } from "./const.js";
+import { MOD_NSEC } from "./const.js";
 
 export function getSecKey() {
-  const nsec = NOSTR_NSEC;
+  const nsec = MOD_NSEC;
   if (nsec.startsWith("nsec")) {
     return nip19.decode(nsec).data as string;
   } else return nsec;
