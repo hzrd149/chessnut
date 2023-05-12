@@ -19,11 +19,13 @@ import InviteCard from "./InviteCard";
 import useGames from "../../hooks/useGames";
 import { QrCodeIcon } from "../../components/Icons";
 import QrScannerModal from "../../components/QrScannerModal";
+import WelcomeModal from "../../components/WelcomeModal";
 
 function HomeView() {
   const games = useGames();
   const [filter, setFilter] = useState("ongoing");
   const [hideNoBets, setShowNoBets] = useState(false);
+  const welcomeModal = useDisclosure();
 
   const filteredGames = useMemo(() => {
     switch (filter) {
@@ -123,6 +125,11 @@ function HomeView() {
           }}
         />
       )}
+      <WelcomeModal
+        isOpen={!welcomeModal.isOpen}
+        onClose={welcomeModal.onToggle}
+        size="lg"
+      />
     </Flex>
   );
 }

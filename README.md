@@ -1,6 +1,8 @@
 # ChessNut
 
-Chess over [nostr](https://github.com/nostr-protocol/nostr) where players can post rewards using [cashu](https://github.com/cashubtc) tokens (nuts)
+Chess over [nostr](https://github.com/nostr-protocol/nostr) where players can place bets using [cashu](https://github.com/cashubtc) tokens (Nuts)
+
+Live demo [Here](https://hzrd149.github.io/chessnut/)
 
 # This is project isn't working yet, don't pay any lightning invoices (you will loose your hard earned sats)
 
