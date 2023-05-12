@@ -48,7 +48,7 @@ export default function Header() {
   return (
     <>
       <Flex p="2" alignItems="center">
-        <Image src="/icon.svg" w="8" mr="2" />
+        <Image src="./icon.svg" w="8" mr="2" />
         <Heading size="lg" isTruncated>
           ChessNut
         </Heading>
