@@ -39,6 +39,10 @@ sub.on("event", async (event) => {
   }
 });
 
+setInterval(() => {
+  ensureConnected(relay);
+}, 5000);
+
 function shutdown() {
   console.log("\n");
   console.log("Shutting down");
