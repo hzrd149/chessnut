@@ -25,7 +25,9 @@ function HomeView() {
   const games = useGames();
   const [filter, setFilter] = useState("ongoing");
   const [hideNoBets, setShowNoBets] = useState(false);
-  const welcomeModal = useDisclosure();
+  const [showWelcome, setShowWelcome] = useState(
+    !localStorage.getItem("welcome")
+  );
 
   const filteredGames = useMemo(() => {
     switch (filter) {
@@ -126,8 +128,11 @@ function HomeView() {
         />
       )}
       <WelcomeModal
-        isOpen={!welcomeModal.isOpen}
-        onClose={welcomeModal.onToggle}
+        isOpen={showWelcome}
+        onClose={() => {
+          setShowWelcome(false);
+          localStorage.setItem("welcome", "true");
+        }}
         size="lg"
       />
     </Flex>
