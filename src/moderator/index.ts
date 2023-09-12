@@ -10,7 +10,7 @@ import crypto from "node:crypto";
 // @ts-ignore
 globalThis.crypto = crypto;
 
-const RELAY_URL = "wss://nostrue.com";
+const RELAY_URL = "wss://nos.lol";
 
 const relay = getRelay(RELAY_URL);
 await ensureConnected(relay);
