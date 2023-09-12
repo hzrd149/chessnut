@@ -22,16 +22,17 @@ import {
   Select,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import { getEncodedToken } from "@cashu/cashu-ts";
+
 import { getWallet } from "../../common/services/cashu";
 import { InvoiceCard } from "./InvoiceCard";
-import { getEncodedToken } from "@cashu/cashu-ts";
 import { useNip04Tools } from "../hooks/useNip04Tools";
 import { useSigner } from "../hooks/useSigner";
 import { getRelay } from "../../common/services/relays";
 import Game from "../../common/classes/game";
 import { buildPlaceBetEvent } from "../helpers/events";
 import { CheckInCircleIcon } from "./Icons";
-import { ensureConnected, waitForPub } from "../../common/helpers/relays";
+import { ensureConnected } from "../../common/helpers/relays";
 
 type MintRequest = {
   amount: number;
@@ -46,7 +47,7 @@ export default function PlaceBetModal({
 }: { game: Game } & Omit<ModalProps, "children">) {
   const [mintRequest, setMintRequest] = useState<MintRequest>();
   const [mintUrl, setMintUrl] = useState(
-    "https://legend.lnbits.com/cashu/api/v1/XHaox6CSQLxTJeAh7fyT7m"
+    "https://legend.lnbits.com/cashu/api/v1/XHaox6CSQLxTJeAh7fyT7m",
   );
   const [amount, setAmount] = useState("2");
   const [loading, setLoading] = useState(false);
@@ -78,9 +79,9 @@ export default function PlaceBetModal({
       setLoading(true);
 
       const wallet = await getWallet(mintUrl);
-      const proofs = await wallet.requestTokens(
+      const { proofs } = await wallet.requestTokens(
         mintRequest.amount,
-        mintRequest.hash
+        mintRequest.hash,
       );
 
       const token = getEncodedToken({
@@ -91,8 +92,7 @@ export default function PlaceBetModal({
       const event = await signer(placeBetDraft);
       const relay = getRelay(game.relay);
       await ensureConnected(relay);
-      const pub = relay.publish(event);
-      await waitForPub(pub);
+      await relay.publish(event);
 
       const timeout = window.setTimeout(() => {
         game.onBet.off(listener);

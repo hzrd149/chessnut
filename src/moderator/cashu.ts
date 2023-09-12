@@ -15,7 +15,7 @@ export async function getWallet(mintUrl: string) {
   if (!wallets.has(mintUrl)) {
     const mint = getMint(mintUrl);
     const keys = await mint.getKeys();
-    const wallet = new CashuWallet(keys, mint);
+    const wallet = new CashuWallet(mint, keys);
     wallets.set(mintUrl, wallet);
     return wallet;
   }

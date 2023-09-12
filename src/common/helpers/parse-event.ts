@@ -37,7 +37,7 @@ export function parseStateEvent(event: Event): ParsedState {
   const stateStr = event.tags.find((t) => t[0] === "state")?.[1];
 
   const previous = event.tags.find(
-    (t) => t[0] === "e" && t[3] === "previous"
+    (t) => t[0] === "e" && t[3] === "previous",
   )?.[1];
   if (!previous) throw new Error("missing previous");
 

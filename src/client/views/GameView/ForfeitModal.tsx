@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Button,
   Modal,
@@ -10,14 +11,14 @@ import {
   ModalProps,
   useToast,
 } from "@chakra-ui/react";
+import { Event } from "nostr-tools";
+
 import Game from "../../../common/classes/game";
 import { useAuth } from "../../AuthProvider";
-import { useState } from "react";
 import { buildForfeitEvent } from "../../helpers/events";
 import { useSigner } from "../../hooks/useSigner";
 import { getRelay } from "../../../common/services/relays";
-import { Event } from "nostr-tools";
-import { ensureConnected, waitForPub } from "../../../common/helpers/relays";
+import { ensureConnected } from "../../../common/helpers/relays";
 
 export default function ForFeitModal({
   game,
@@ -43,8 +44,7 @@ export default function ForFeitModal({
       const event = await signer(draft);
       const relay = getRelay(game.relay);
       await ensureConnected(relay);
-      const pub = relay.publish(event);
-      await waitForPub(pub);
+      await relay.publish(event);
       if (onForfeit) onForfeit(event);
     } catch (e) {
       if (e instanceof Error) {

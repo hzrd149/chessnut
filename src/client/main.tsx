@@ -17,5 +17,5 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <AuthProvider>
       <App />
     </AuthProvider>
-  </ChakraProvider>
+  </ChakraProvider>,
 );

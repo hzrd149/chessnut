@@ -26,7 +26,7 @@ function HomeView() {
   const [filter, setFilter] = useState("ongoing");
   const [hideNoBets, setShowNoBets] = useState(false);
   const [showWelcome, setShowWelcome] = useState(
-    !localStorage.getItem("welcome")
+    !localStorage.getItem("welcome"),
   );
 
   const filteredGames = useMemo(() => {
@@ -45,7 +45,7 @@ function HomeView() {
     : filteredGames;
 
   const sortedGames = Array.from(filteredGamesWithBets).sort(
-    (a, b) => b.getTotalBets() - a.getTotalBets()
+    (a, b) => b.getTotalBets() - a.getTotalBets(),
   );
 
   const {

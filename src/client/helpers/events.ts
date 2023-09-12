@@ -11,7 +11,7 @@ export function buildGameEvent(
   self: string,
   target: string,
   message: string,
-  moderator: string
+  moderator: string,
 ) {
   const draft: EventTemplate = {
     kind: 2500 as number,

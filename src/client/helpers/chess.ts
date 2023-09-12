@@ -6,7 +6,7 @@ export type ChessgroundConfig = NonNullable<
 >;
 
 export function shortColorToLong(
-  c: Color
+  c: Color,
 ): NonNullable<ChessgroundConfig["orientation"]> {
   return c === "w" ? "white" : "black";
 }

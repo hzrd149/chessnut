@@ -16,7 +16,7 @@ export function useNip04Tools() {
       }
       throw new Error("No signing method");
     },
-    [auth.nip07, auth.secKey]
+    [auth.nip07, auth.secKey],
   );
   const decrypt = useCallback(
     async (pubkey: string, encrypted: string) => {
@@ -29,7 +29,7 @@ export function useNip04Tools() {
       }
       throw new Error("No signing method");
     },
-    [auth.nip07, auth.secKey]
+    [auth.nip07, auth.secKey],
   );
 
   return { encrypt, decrypt };

@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { Event } from "nostr-tools";
 import {
   Box,
   Button,
@@ -9,22 +11,20 @@ import {
   CardProps,
   Flex,
   Heading,
-  Select,
   Text,
   Textarea,
   useToast,
 } from "@chakra-ui/react";
+
 import { useAuth } from "../../AuthProvider";
 import UserAvatar from "../../components/UserAvatar";
 import useUserMetadata from "../../hooks/useUserMetadata";
-import { useState } from "react";
 import { getRelay } from "../../../common/services/relays";
 import { useSigner } from "../../hooks/useSigner";
 import { GameTypes } from "../../../common/enum";
 import { MODERATOR_PUBKEY, RELAY_URL } from "../../const";
 import { buildGameEvent } from "../../helpers/events";
-import { Event } from "nostr-tools";
-import { ensureConnected, waitForPub } from "../../../common/helpers/relays";
+import { ensureConnected } from "../../../common/helpers/relays";
 
 export default function InviteCard({
   pubkey,
@@ -47,14 +47,13 @@ export default function InviteCard({
         auth.pubkey,
         pubkey,
         message,
-        MODERATOR_PUBKEY
+        MODERATOR_PUBKEY,
       );
       const signed = await signer(draft);
       if (!signed) throw new Error("failed to sign");
       const relay = getRelay(RELAY_URL);
       await ensureConnected(relay);
-      const pub = relay.publish(signed);
-      await waitForPub(pub);
+      await relay.publish(signed);
       toast({ status: "success", title: "Created game" });
       if (onCreateGame) onCreateGame(signed);
     } catch (e) {

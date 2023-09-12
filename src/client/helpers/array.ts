@@ -11,7 +11,7 @@ export function validationFilter<T extends unknown>(fn: (v: T) => any) {
 
 export function arraySafeParse<In extends unknown, Out extends unknown>(
   arr: In[],
-  fn: (v: In) => Out
+  fn: (v: In) => Out,
 ) {
   const parsed: Out[] = [];
   for (const item of arr) {

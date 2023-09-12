@@ -15,7 +15,7 @@ export function useSigner() {
       }
       throw new Error("No signing method");
     },
-    [auth]
+    [auth],
   );
 
   return signer;

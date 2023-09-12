@@ -12,6 +12,7 @@ import {
   Spacer,
 } from "@chakra-ui/react";
 import { withErrorBoundary } from "react-error-boundary";
+
 import { ErrorFallback } from "../../components/ErrorBoundary";
 import UserAvatar from "../../components/UserAvatar";
 import Chessboard from "./Chessboard";
@@ -23,7 +24,7 @@ import PlaceBetModal from "../../components/PlaceBetModal";
 import { useAuth } from "../../AuthProvider";
 import { loadGameById } from "../../services/games";
 import ForFeitModal from "./ForfeitModal";
-import { ensureConnected, waitForPub } from "../../../common/helpers/relays";
+import { ensureConnected } from "../../../common/helpers/relays";
 import RewardModal from "../../components/RewardModal";
 import { GameTypes } from "../../../common/enum";
 import ChessGame from "../../../common/classes/chess-game";
@@ -49,7 +50,7 @@ function GameView() {
 
   const { value: game, error } = useAsync(
     () => loadGameById(gameId, relay ?? undefined),
-    [gameId]
+    [gameId],
   );
   if (error) return <Heading>Failed to load game {error.message}</Heading>;
 
@@ -81,8 +82,7 @@ function GameView() {
         const event = await signer(draft);
         const relay = getRelay(game.relay);
         await ensureConnected(relay);
-        const pub = relay.publish(event);
-        await waitForPub(pub);
+        await relay.publish(event);
         game.handleStateEvent(event);
       } catch (e) {
         if (e instanceof Error) {
@@ -90,7 +90,7 @@ function GameView() {
         }
       }
     },
-    [game]
+    [game],
   );
 
   if (!game?.loaded) return <Spinner />;

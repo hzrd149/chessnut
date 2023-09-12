@@ -2,7 +2,7 @@ import { useForceUpdate } from "framer-motion";
 
 export function singletonHook<Hook extends (...args: any) => any>(
   hook: Hook,
-  keyFromArgs: (...args: Parameters<Hook>) => string
+  keyFromArgs: (...args: Parameters<Hook>) => string,
 ): Hook {
   const cache = new Map<string, ReturnType<Hook>>();
   const listeners = new Set<Function>();

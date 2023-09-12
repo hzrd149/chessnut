@@ -53,13 +53,13 @@ export default class Game {
     this.playerA = event.pubkey;
 
     const playerB = event.tags.find(
-      (t) => t[0] === "p" && t[3] === "playerB"
+      (t) => t[0] === "p" && t[3] === "playerB",
     )?.[1];
     if (!playerB) throw new Error("game missing playerB");
     this.playerB = playerB;
 
     const moderator = event.tags.find(
-      (t) => t[0] === "p" && t[3] === "moderator"
+      (t) => t[0] === "p" && t[3] === "moderator",
     )?.[1];
     if (!moderator) throw new Error("game missing moderator");
     this.moderator = moderator;

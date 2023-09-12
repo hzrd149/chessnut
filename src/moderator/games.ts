@@ -1,13 +1,14 @@
 import { Event, EventTemplate, finishEvent, nip04 } from "nostr-tools";
+import dayjs from "dayjs";
+
 import ChessGame from "../common/classes/chess-game.js";
 import { RELAY_URL } from "./const.js";
 import { getRelay } from "./relays.js";
 import createGameClass from "../common/helpers/create-game.js";
-import dayjs from "dayjs";
 import { GameEventKinds, GameFinishReasons } from "../common/enum.js";
 import { getFullTokenForBet } from "./db.js";
 import { getSecKey } from "./keys.js";
-import { waitForPub, ensureConnected } from "../common/helpers/relays.js";
+import { ensureConnected } from "../common/helpers/relays.js";
 import TicTacToeGame from "../common/classes/tic-tac-toe-game.js";
 import Game from "../common/classes/game.js";
 
@@ -64,7 +65,7 @@ async function checkGameState(game: Game) {
         let encryptedTokens = await nip04.encrypt(
           getSecKey(),
           winner,
-          JSON.stringify(tokens)
+          JSON.stringify(tokens),
         );
         draft.tags.push(["cashu", encryptedTokens, winner]);
       }
@@ -72,8 +73,7 @@ async function checkGameState(game: Game) {
       const event = await finishEvent(draft, getSecKey());
       const relay = getRelay(game.relay);
       await ensureConnected(relay);
-      const pub = relay.publish(event);
-      await waitForPub(pub);
+      await relay.publish(event);
 
       console.log(`Published finish event for ${game.id}`);
     } catch (e) {
@@ -107,7 +107,7 @@ async function checkGameState(game: Game) {
         let encryptedTokens = await nip04.encrypt(
           getSecKey(),
           game.playerA,
-          JSON.stringify(tokens[game.playerA])
+          JSON.stringify(tokens[game.playerA]),
         );
         draft.tags.push(["cashu", encryptedTokens, game.playerA]);
       }
@@ -115,7 +115,7 @@ async function checkGameState(game: Game) {
         let encryptedTokens = await nip04.encrypt(
           getSecKey(),
           game.playerB,
-          JSON.stringify(tokens[game.playerB])
+          JSON.stringify(tokens[game.playerB]),
         );
         draft.tags.push(["cashu", encryptedTokens, game.playerB]);
       }
@@ -123,8 +123,7 @@ async function checkGameState(game: Game) {
       const event = await finishEvent(draft, getSecKey());
       const relay = getRelay(game.relay);
       await ensureConnected(relay);
-      const pub = relay.publish(event);
-      await waitForPub(pub);
+      await relay.publish(event);
 
       console.log(`Published finish event for ${game.id}`);
     } catch (e) {

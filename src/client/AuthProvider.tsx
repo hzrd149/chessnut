@@ -7,7 +7,6 @@ import {
 } from "react";
 import {
   EventTemplate,
-  Kind,
   generatePrivateKey,
   getPublicKey,
   finishEvent,
@@ -20,6 +19,7 @@ import {
   animals,
 } from "unique-names-generator";
 import dayjs from "dayjs";
+
 import { RELAY_URL } from "./const";
 import { ensureConnected } from "../common/helpers/relays";
 
@@ -37,7 +37,7 @@ async function publishInitialMetadata(secKey: string) {
   };
 
   const draft: EventTemplate = {
-    kind: Kind.Metadata,
+    kind: 0,
     created_at: dayjs().unix(),
     content: JSON.stringify(metadata),
     tags: [],
@@ -77,7 +77,7 @@ export default function AuthProvider({ children }: PropsWithChildren) {
     return secKey;
   });
   const [pubkey, setPubkey] = useState<string>(() =>
-    getPublicKey(secKey as string)
+    getPublicKey(secKey as string),
   );
   const [nip07, setNip07] = useState(false);
 
