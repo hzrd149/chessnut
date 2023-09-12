@@ -4,4 +4,4 @@ WORKDIR /app
 COPY . /app/
 RUN yarn install && yarn build:mod
 
-ENTRYPOINT [ "yarn", "start:mod" ]
+ENTRYPOINT [ "node", "./dist/moderator/index.js" ]
