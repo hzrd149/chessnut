@@ -4,7 +4,7 @@ Chess over [nostr](https://github.com/nostr-protocol/nostr) where players can pl
 
 Live demo [Here](https://hzrd149.github.io/chessnut/)
 
-# This is project isn't working yet, don't pay any lightning invoices (you will loose your hard earned sats)
+# This is project isn't working yet, don't pay any lightning invoices (you will lose your hard earned sats)
 
 ## Nostr Events
 
